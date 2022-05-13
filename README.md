@@ -1,4 +1,4 @@
-# Notes App API
+# EcoSense App API
 
 ## Introduction
 A RESTful API built with ExpressJS for CRUD operation.\
