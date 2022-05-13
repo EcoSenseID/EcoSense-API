@@ -24,7 +24,7 @@ const getUserById = (request, response) => {
         response.status(200).json({
             status: 'success',
             data: {
-                users: results.rows
+                user: results.rows
             }
         });
     })

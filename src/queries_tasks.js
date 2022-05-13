@@ -24,7 +24,7 @@ const getTaskById = (request, response) => {
         response.status(200).json({
             status: 'success',
             data: {
-                tasks: results.rows
+                task: results.rows
             }
         });
     })

@@ -24,7 +24,7 @@ const getCampaignById = (request, response) => {
         response.status(200).json({
             status: 'success',
             data: {
-                campaigns: results.rows
+                campaign: results.rows
             }
         });
     })
