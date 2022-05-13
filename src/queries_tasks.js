@@ -1,11 +1,4 @@
-const Pool = require('pg').Pool;
-const pool = new Pool({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'ecosense-db-sql',
-  password: '12345678',
-  port: 5432,
-});
+const pool = require('./pool');
 
 const getTasks = (request, response) => {
     pool.query('SELECT * FROM tasks ORDER BY id ASC', (error, results) => {

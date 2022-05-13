@@ -1,13 +1,13 @@
 const db_users = require('./queries_users');
 const db_campaigns = require('./queries_campaigns');
 const db_tasks = require('./queries_tasks');
+const { PORT } = require('./env_config');
 
 const express = require('express');
 const bodyParser = require('body-parser');
 
 // Initializing express
 const app = express();
-const port = 3000;
 
 // Middlewares
 app.use(bodyParser.json());
@@ -19,7 +19,7 @@ app.use(
 
 // Sample method
 app.get('/', (request, response) => {
-    response.json({ info: 'Node.js, Express, and Postgres API' })
+    response.json({ info: 'Welcome to EcoSense API! This API is built using Node.js, Express and Postgres API.' })
 });
 
 // Methods for users
@@ -44,6 +44,6 @@ app.put('/tasks/:id', db_tasks.updateTask);
 app.delete('/tasks/:id', db_tasks.deleteTask);
 
 // Server listening for requests
-app.listen(port, () => {
-    console.log(`App running on port ${port}.`);
+app.listen(PORT, () => {
+    console.log(`App running on port ${PORT}.`);
 });
