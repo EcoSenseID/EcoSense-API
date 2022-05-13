@@ -1,4 +1,4 @@
-const Pool = require('pg').Pool
+const Pool = require('pg').Pool;
 const pool = new Pool({
   user: 'postgres',
   host: 'localhost',
@@ -38,25 +38,26 @@ const getCampaignById = (request, response) => {
 };
 
 const createCampaign = (request, response) => {
-    const { name, email, profile_picture_url } = request.body
+    const { title, initiator, description, start_date, end_date, poster_url } = request.body
   
-    pool.query('INSERT INTO campaigns (name, email, profile_picture_url) VALUES ($1, $2, $3) RETURNING id', [name, email, profile_picture_url], (error, results) => {
+    pool.query('INSERT INTO campaigns (title, initiator, description, start_date, end_date, poster_url) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id', 
+        [title, initiator, description, start_date, end_date, poster_url], (error, results) => {
         if (error) {
             throw error;
         }
-        response.status(201).send(`User added with ID: ${results.rows[0].id}`);
+        response.status(201).send(`Campaign added with ID: ${results.rows[0].id}`);
     });
 };
 
 const updateCampaign = (request, response) => {
     const id = parseInt(request.params.id)
-    const { name, email, profile_picture_url } = request.body
+    const { title, initiator, description, start_date, end_date, poster_url } = request.body
   
-    pool.query('UPDATE campaigns SET name = $1, email = $2, profile_picture_url = $3 WHERE id = $4', [name, email, profile_picture_url, id], (error, results) => {
+    pool.query('UPDATE campaigns SET title = $1, initiator = $2, description = $3, start_date = $4, end_date = $5, poster_url = $6 WHERE id = $7', [title, initiator, description, start_date, end_date, poster_url, id], (error, results) => {
         if (error) {
           throw error;
         }
-        response.status(200).send(`User modified with ID: ${id}`);
+        response.status(200).send(`Campaign modified with ID: ${id}`);
       }
     )
 };
@@ -68,7 +69,7 @@ const deleteCampaign = (request, response) => {
       if (error) {
         throw error;
       }
-      response.status(200).send(`User deleted with ID: ${id}`);
+      response.status(200).send(`Campaign deleted with ID: ${id}`);
     })
 };
 
