@@ -7,6 +7,8 @@ const getTasks = (request, response) => {
         }
         response.status(200).json({
             status: 'success',
+            rowProcessed: results.rowCount,
+            rowCount: results.rows.length,
             data: {
                 tasks: results.rows
             }
@@ -23,6 +25,8 @@ const getTaskById = (request, response) => {
         }
         response.status(200).json({
             status: 'success',
+            rowProcessed: results.rowCount,
+            rowCount: results.rows.length,
             data: {
                 task: results.rows
             }

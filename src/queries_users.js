@@ -7,6 +7,8 @@ const getUsers = (request, response) => {
         }
         response.status(200).json({
             status: 'success',
+            rowProcessed: results.rowCount,
+            rowCount: results.rows.length,
             data: {
                 users: results.rows
             }
@@ -23,6 +25,8 @@ const getUserById = (request, response) => {
         }
         response.status(200).json({
             status: 'success',
+            rowProcessed: results.rowCount,
+            rowCount: results.rows.length,
             data: {
                 user: results.rows
             }

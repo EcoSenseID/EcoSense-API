@@ -7,6 +7,8 @@ const getCategories = (request, response) => {
         }
         response.status(200).json({
             status: 'success',
+            rowProcessed: results.rowCount,
+            rowCount: results.rows.length,
             data: {
                 categories: results.rows
             }
@@ -23,6 +25,8 @@ const getCategoryById = (request, response) => {
         }
         response.status(200).json({
             status: 'success',
+            rowProcessed: results.rowCount,
+            rowCount: results.rows.length,
             data: {
                 category: results.rows
             }

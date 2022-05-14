@@ -7,6 +7,8 @@ const getCampaigns = (request, response) => {
         }
         response.status(200).json({
             status: 'success',
+            rowProcessed: results.rowCount,
+            rowCount: results.rows.length,
             data: {
                 campaigns: results.rows
             }
@@ -23,6 +25,8 @@ const getCampaignById = (request, response) => {
         }
         response.status(200).json({
             status: 'success',
+            rowProcessed: results.rowCount,
+            rowCount: results.rows.length,
             data: {
                 campaign: results.rows
             }
