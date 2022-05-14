@@ -6,6 +6,7 @@ const db_campaigns = require('./queries_campaigns');
 const db_tasks = require('./queries_tasks');
 const db_categories = require('./queries_categories');
 const db_user_exp_points = require('./queries_user_xp_points');
+const db_completed_tasks = require('./queries_completed_tasks');
 
 // env
 const { PORT } = require('./env_config');
@@ -23,7 +24,10 @@ app.use(
 
 // Sample method
 app.get('/', (request, response) => {
-    response.json({ info: 'Welcome to EcoSense API! This API is built using Node.js, Express and Postgres API.' })
+    response.status(200).json({ 
+      status: 'success',
+      info: 'Welcome to EcoSense API! This API is built using Node.js, Express and Postgres API.' 
+    });
 });
 
 // Methods for users
@@ -61,6 +65,14 @@ app.get('/user_exp_points/category/:id_category', db_user_exp_points.getUserExpP
 app.post('/user_exp_points', db_user_exp_points.createUserExpPoint);
 app.put('/user_exp_points/:id_user/:id_category', db_user_exp_points.updateUserExpPoint);
 app.delete('/user_exp_points/:id_user/:id_category', db_user_exp_points.deleteUserExpPoint);
+
+// Methods for completed tasks
+app.get('/completed_tasks', db_completed_tasks.getAllCompletedTasks);
+app.get('/completed_tasks/task/:id_task', db_completed_tasks.getCompletedTaskByTaskId);
+app.get('/completed_tasks/user/:id_user', db_completed_tasks.getCompletedTaskByUserId);
+app.get('/completed_tasks', db_completed_tasks.createNewCompletedTask);
+app.get('/completed_tasks/:id_user/:id_task', db_completed_tasks.updateCompletedTask);
+app.get('/completed_tasks/:id_user/:id_task', db_completed_tasks.deleteCompletedTask);
 
 // Server listening for requests
 app.listen(PORT, () => {
