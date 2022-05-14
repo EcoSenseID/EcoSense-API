@@ -25,6 +25,7 @@ const getUserExpPointByUserId = (request, response) => {
         }
         response.status(200).json({
             status: 'success',
+            command: results.command,
             rowProcessed: results.rowCount,
             rowCount: results.rows.length,
             data: {
@@ -43,6 +44,7 @@ const getUserExpPointByCategoryId = (request, response) => {
         }
         response.status(200).json({
             status: 'success',
+            command: results.command,
             rowProcessed: results.rowCount,
             rowCount: results.rows.length,
             data: {

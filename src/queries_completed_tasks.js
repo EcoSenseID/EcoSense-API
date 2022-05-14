@@ -7,6 +7,7 @@ const getAllCompletedTasks = (request, response) => {
         }
         response.status(200).json({
             status: 'success',
+            command: results.command,
             rowProcessed: results.rowCount,
             rowCount: results.rows.length,
             data: {
@@ -25,6 +26,7 @@ const getCompletedTaskByTaskId = (request, response) => {
         }
         response.status(200).json({
             status: 'success',
+            command: results.command,
             rowProcessed: results.rowCount,
             rowCount: results.rows.length,
             data: {
@@ -43,6 +45,7 @@ const getCompletedTaskByUserId = (request, response) => {
         }
         response.status(200).json({
             status: 'success',
+            command: results.command,
             rowProcessed: results.rowCount,
             rowCount: results.rows.length,
             data: {

@@ -8,6 +8,7 @@ const db_categories = require('./queries_categories');
 const db_user_exp_points = require('./queries_user_xp_points');
 const db_completed_tasks = require('./queries_completed_tasks');
 const db_category_campaign = require('./queries_category_campaign');
+const db_campaign_participant = require('./queries_campaign_participant');
 
 // env
 const { PORT } = require('./env_config');
@@ -75,13 +76,21 @@ app.post('/completed_tasks', db_completed_tasks.createNewCompletedTask);
 app.put('/completed_tasks/:id_user/:id_task', db_completed_tasks.updateCompletedTask);
 app.delete('/completed_tasks/:id_user/:id_task', db_completed_tasks.deleteCompletedTask);
 
-// Methods for campaign-category
+// Methods for campaign_category
 app.get('/category_campaign', db_category_campaign.getAllCategoryCampaign);
 app.get('/category_campaign/campaign/:id_campaign', db_category_campaign.getCategoryListByCampaignId);
 app.get('/category_campaign/category/:id_category', db_category_campaign.getCampaignListByCategoryId);
 app.post('/category_campaign', db_category_campaign.createNewCampaignCategory);
 app.put('/category_campaign/:id_campaign/:id_category', db_category_campaign.updateCampaignCategory);
 app.delete('/category_campaign/:id_campaign/:id_category', db_category_campaign.deleteCampaignCategory);
+
+// Methods for campaign_participant
+app.get('/campaign_participant', db_campaign_participant.getAllCampaignParticipant);
+app.get('/campaign_participant/campaign/:id_campaign', db_campaign_participant.getUserListByCampaignId);
+app.get('/campaign_participant/user/:id_user', db_campaign_participant.getCampaignListByUserId);
+app.post('/campaign_participant', db_campaign_participant.createNewCampaignParticipantDetails);
+app.put('/campaign_participant/:id_user/:id_category', db_campaign_participant.updateCampaignParticipantDetails);
+app.delete('/campaign_participant/:id_user/:id_category', db_campaign_participant.deleteCampaignParticipantDetails);
 
 // Server listening for requests
 app.listen(PORT, () => {
