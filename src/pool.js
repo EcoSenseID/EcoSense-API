@@ -12,9 +12,9 @@ const pool = new Pool({
   connectionTimeoutMillis: 2000,
   ssl: {
     rejectUnauthorized: false,
-    ca: fs.readFileSync('server-ca.pem').toString(),
-    key: fs.readFileSync('client-key.pem').toString(),
-    cert: fs.readFileSync('client-cert.pem').toString(),
+    ca: fs.readFileSync('./ssl/server-ca.pem').toString(),
+    key: fs.readFileSync('./ssl/client-key.pem').toString(),
+    cert: fs.readFileSync('./ssl/client-cert.pem').toString(),
   }
 });
 
