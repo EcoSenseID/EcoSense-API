@@ -1,4 +1,5 @@
 const Pool = require('pg').Pool;
+const fs = require('fs');
 const { DB_USER, DB_HOST, DB_NAME, DB_PWD, DB_PORT } = require('./env_config');
 
 const pool = new Pool({
@@ -11,9 +12,9 @@ const pool = new Pool({
   connectionTimeoutMillis: 2000,
   ssl: {
     rejectUnauthorized: false,
-    ca: fs.readFileSync('../server-ca.pem').toString(),
-    key: fs.readFileSync('../client-key.pem').toString(),
-    cert: fs.readFileSync('..client-cert.pem').toString(),
+    ca: fs.readFileSync('server-ca.pem').toString(),
+    key: fs.readFileSync('client-key.pem').toString(),
+    cert: fs.readFileSync('client-cert.pem').toString(),
   }
 });
 
