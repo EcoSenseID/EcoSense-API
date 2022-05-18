@@ -8,7 +8,13 @@ const pool = new Pool({
   password: DB_PWD,
   port: DB_PORT,
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000
+  connectionTimeoutMillis: 2000,
+  ssl: {
+    rejectUnauthorized: false,
+    ca: fs.readFileSync('../server-ca.pem').toString(),
+    key: fs.readFileSync('../client-key.pem').toString(),
+    cert: fs.readFileSync('..client-cert.pem').toString(),
+  }
 });
 
 module.exports = pool;
