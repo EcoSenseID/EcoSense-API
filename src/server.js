@@ -1,14 +1,14 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 
-const db_users = require('./queries_users');
-const db_campaigns = require('./queries_campaigns');
-const db_tasks = require('./queries_tasks');
-const db_categories = require('./queries_categories');
-const db_user_exp_points = require('./queries_user_xp_points');
-const db_completed_tasks = require('./queries_completed_tasks');
-const db_category_campaign = require('./queries_category_campaign');
-const db_campaign_participant = require('./queries_campaign_participant');
+const db_users = require('./sql-queries/queries_users');
+const db_campaigns = require('./sql-queries/queries_campaigns');
+const db_tasks = require('./sql-queries/queries_tasks');
+const db_categories = require('./sql-queries/queries_categories');
+const db_user_exp_points = require('./sql-queries/queries_user_xp_points');
+const db_completed_tasks = require('./sql-queries/queries_completed_tasks');
+const db_category_campaign = require('./sql-queries/queries_category_campaign');
+const db_campaign_participant = require('./sql-queries/queries_campaign_participant');
 
 // env
 const { PORT } = require('./env_config');

@@ -1,4 +1,4 @@
-const pool = require('./pool');
+const pool = require('../pool');
 
 const getAllCompletedTasks = (request, response) => {
     pool.query('SELECT * FROM completed_tasks ORDER BY id_task, id_user ASC', (error, results) => {

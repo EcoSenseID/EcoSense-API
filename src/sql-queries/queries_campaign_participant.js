@@ -1,4 +1,4 @@
-const pool = require('./pool');
+const pool = require('../pool');
 
 const getAllCampaignParticipant = (request, response) => {
     pool.query('SELECT * FROM campaign_participant ORDER BY id_campaign, id_user ASC', (error, results) => {

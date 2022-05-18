@@ -1,4 +1,4 @@
-const pool = require('./pool');
+const pool = require('../pool');
 
 const getAllUserExpPoints = (request, response) => {
     pool.query('SELECT * FROM user_experience_points ORDER BY id_category, id_user ASC', (error, results) => {
