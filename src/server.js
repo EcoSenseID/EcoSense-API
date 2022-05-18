@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 
 const db_users = require('./sql-queries/queries_users');
 const db_campaigns = require('./sql-queries/queries_campaigns');
@@ -23,6 +24,11 @@ app.use(
     extended: true,
   })
 );
+const corsOptions = {
+  origin: 'https://ecosense-web.herokuapp.com',
+  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+}
+app.use(cors(corsOptions));
 
 // Sample method
 app.get('/', (request, response) => {
