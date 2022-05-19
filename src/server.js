@@ -11,6 +11,8 @@ const db_completed_tasks = require('./sql-queries/queries_completed_tasks');
 const db_category_campaign = require('./sql-queries/queries_category_campaign');
 const db_campaign_participant = require('./sql-queries/queries_campaign_participant');
 
+const db_api = require('./sql-queries/queries_api');
+
 // env
 const { PORT } = require('./env_config');
 
@@ -25,7 +27,7 @@ app.use(
   })
 );
 const corsOptions = {
-  origin: 'https://ecosense-web.herokuapp.com',
+  origin: ['https://ecosense-web.herokuapp.com', 'http://localhost:3000'],
   optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 }
 app.use(cors(corsOptions));
@@ -60,7 +62,7 @@ app.put('/tasks/:id', db_tasks.updateTask);
 app.delete('/tasks/:id', db_tasks.deleteTask);
 
 // Methods for categories
-app.get('/categories', db_categories.getCategories);
+// app.get('/categories', db_categories.getCategories);
 app.get('/categories/:id', db_categories.getCategoryById);
 app.post('/categories', db_categories.createCategory);
 app.put('/categories/:id', db_categories.updateCategory);
@@ -97,6 +99,11 @@ app.get('/campaign_participant/user/:id_user', db_campaign_participant.getCampai
 app.post('/campaign_participant', db_campaign_participant.createNewCampaignParticipantDetails);
 app.put('/campaign_participant/:id_user/:id_category', db_campaign_participant.updateCampaignParticipantDetails);
 app.delete('/campaign_participant/:id_user/:id_category', db_campaign_participant.deleteCampaignParticipantDetails);
+
+// Endpoints based on API requirements
+app.get('/campaign', db_api.getCampaign);
+app.get('/categories', db_api.getAllCategories);
+app.get('/detail/:id', db_api.getCampaignDetail);
 
 // Server listening for requests
 app.listen(PORT, () => {
