@@ -104,6 +104,7 @@ app.delete('/campaign_participant/:id_user/:id_category', db_campaign_participan
 app.get('/campaign', db_api.getCampaign);
 app.get('/categories', db_api.getAllCategories);
 app.get('/detail/:id', db_api.getCampaignDetail);
+app.get('/profile/:id', db_api.getProfile);
 
 // Server listening for requests
 app.listen(PORT, () => {

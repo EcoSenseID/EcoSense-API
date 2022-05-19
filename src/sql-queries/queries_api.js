@@ -1,15 +1,23 @@
 const pool = require('../pool');
 
 const getCampaign = (request, response) => {
+    const categoryId = request.query.categoryId || null;
+    const keyword = request.query.q || '';
+    // console.log(categoryId, keyword);
     try {
         const queryString = `
             SELECT * FROM campaigns
             LEFT JOIN ( SELECT id_campaign, array_agg(id_category) as categories FROM category_campaign GROUP BY id_campaign) AS a
             ON campaigns.id = a.id_campaign
             LEFT JOIN ( SELECT id_campaign, COUNT(id_user) as participant_count FROM campaign_participant GROUP BY id_campaign) AS b
-            ON campaigns.id = b.id_campaign;
+            ON campaigns.id = b.id_campaign
+            ${`WHERE (LOWER(title) LIKE '%${keyword}%'`}
+            );
         `;
+        // Fitur filter by categoryId pending, menunggu data category masuk ke DB.
+        // console.log(queryString);
         pool.query(queryString, (error, results) => {
+            // console.log(results);
             response.status(200).json({
                 error: false,
                 message: "Campaigns fetched successfully",
@@ -26,6 +34,7 @@ const getCampaign = (request, response) => {
                     isNew: Math.round((new Date().getTime() - data.start_date.getTime())/(1000*60*60*24)) <= 7
                 }))
             });
+            if (error) throw error;
         })
     }
     catch(error) {
@@ -97,8 +106,42 @@ const getCampaignDetail = (request, response) => {
     }
 }
 
+const getProfile = (request, response) => {
+    const id = parseInt(request.params.id);
+    try {
+        const queryString = `
+            SELECT * FROM users 
+            LEFT JOIN ( 
+                SELECT id_user, array_agg(json_build_object('idCategory', id_category, 'userXp', experience_point)) as experience FROM user_experience_points GROUP BY id_user
+            ) AS a
+            ON users.id = a.id_user
+            WHERE id = '${id}';
+        `;
+        pool.query(queryString, (error, results) => {
+            response.status(200).json({
+                error: false,
+                message: "Profile fetched successfully",
+                ...results.rows.map(data => ({
+                    name: data.name,
+                    email: data.email,
+                    profilePicUrl: data.profile_picture_url,
+                    experience: data.experience || [],
+                    completedCampaigns: [] //edit soon
+                }))[0]
+            });
+            if (error) throw error;
+        });
+    }
+    catch(error) {
+        response.status(error.code || 400).json({
+            error: true, message: error.message
+        });
+    }
+}
+
 module.exports = {
     getCampaign,
     getAllCategories,
-    getCampaignDetail
+    getCampaignDetail,
+    getProfile
 }
