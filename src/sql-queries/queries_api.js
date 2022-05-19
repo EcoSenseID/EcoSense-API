@@ -11,8 +11,8 @@ const getCampaign = (request, response) => {
             ON campaigns.id = a.id_campaign
             LEFT JOIN ( SELECT id_campaign, COUNT(id_user) as participant_count FROM campaign_participant GROUP BY id_campaign) AS b
             ON campaigns.id = b.id_campaign
-            ${`WHERE (LOWER(title) LIKE '%${keyword}%'`}
-            );
+            ${`WHERE (LOWER(title) LIKE '%${keyword}%'`})
+            ORDER BY id;
         `;
         // Fitur filter by categoryId pending, menunggu data category masuk ke DB.
         // console.log(queryString);
@@ -26,6 +26,7 @@ const getCampaign = (request, response) => {
                     id: data.id,
                     posterUrl: data.poster_url,
                     title: data.title,
+                    description: data.description,
                     startDate: data.start_date,
                     endDate: data.end_date,
                     category: data.categories || [],
@@ -46,7 +47,7 @@ const getCampaign = (request, response) => {
 
 const getAllCategories = (request, response) => {
     try {
-        const queryString = `SELECT * FROM categories;`;
+        const queryString = `SELECT * FROM categories ORDER BY id;`;
         pool.query(queryString, (error, results) => {
             response.status(200).json({
                 error: false,
