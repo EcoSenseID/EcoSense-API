@@ -1,4 +1,5 @@
 const pool = require('../pool');
+const getUid = require('../firebase-auth/getUid');
 
 const getCampaign = (request, response) => {
     const categoryId = request.query.categoryId || null;
@@ -39,6 +40,22 @@ const getCampaign = (request, response) => {
         })
     }
     catch(error) {
+        response.status(error.code || 400).json({
+            error: true, message: error.message
+        });
+    }
+}
+
+const getDashboard = (request, response) => {
+    try {
+        response.status(200).json({
+            error: false,
+            message: "Dashboard fetched successfully",
+            tasks: [],
+            completedCampaigns: []
+        });
+    }
+    catch (err) {
         response.status(error.code || 400).json({
             error: true, message: error.message
         });
@@ -107,7 +124,7 @@ const getCampaignDetail = (request, response) => {
     }
 }
 
-const getProfile = (request, response) => {
+const getContributions = (request, response) => {
     const id = parseInt(request.params.id);
     try {
         const queryString = `
@@ -140,9 +157,70 @@ const getProfile = (request, response) => {
     }
 }
 
+const postProof = async (request, response) => {
+    const { taskId, photo, caption } = request.body;
+    const { authorization } = request.headers;
+    const uid = await getUid(authorization);
+
+    try {
+        response.status(200).json({
+            error: false,
+            message: "Success",
+            uid: uid
+        });
+    }
+    catch (err) {
+        response.status(error.code || 400).json({
+            error: true, message: error.message
+        });
+    }
+}
+
+const postCompleteCampaign = async (request, response) => {
+    const { campaignId } = request.body;
+    const { authorization } = request.headers;
+    const uid = await getUid(authorization);
+
+    try {
+        response.status(200).json({
+            error: false,
+            message: "Success",
+            uid: uid
+        });
+    }
+    catch (err) {
+        response.status(error.code || 400).json({
+            error: true, message: error.message
+        });
+    }
+}
+
+const joinCampaign = async (request, response) => {
+    const { campaignId } = request.body;
+    const { authorization } = request.headers;
+    const uid = await getUid(authorization);
+
+    try {
+        response.status(200).json({
+            error: false,
+            message: "Success",
+            uid: uid
+        });
+    }
+    catch (err) {
+        response.status(error.code || 400).json({
+            error: true, message: error.message
+        });
+    }
+}
+
 module.exports = {
     getCampaign,
+    getDashboard,
     getAllCategories,
     getCampaignDetail,
-    getProfile
+    getContributions,
+    postProof,
+    postCompleteCampaign,
+    joinCampaign
 }

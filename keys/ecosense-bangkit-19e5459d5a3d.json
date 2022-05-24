@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "ecosense-bangkit",
+  "private_key_id": "19e5459d5a3d5489d0c89e4760184903a060e412",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDphtNsdhdubLuh\nvYEWWOfhHVm5kAPXAvSAHV1Ci3H0rQ0tQOYnOQLWNgOVFgBJlDhJviq6TMBCnFT/\nePx6YjZH9hwVPHIc/8+kf6JHpxOAyFUTb74e1yWOqFgqSwUALW6+ykBHX19Mm+mO\nM5GfhLoOMKWIBTNc6CyAJNJ+SAeJo2pZIke7wEOx12rLE/ShfjEmVCRCM4RdFuXk\n4Zq6yjViGjA724D2EaPoytgLkWalY/IKLe4EFiK0toCcOsvH7mL5XPyxxHHD9PpI\n+vfJrA5BZ/FkPV57wW2BUAZ9hUBNz23N3e+v9lUjuIziJvFfXCnt8n7iEJnKCqEH\nlNosdGanAgMBAAECggEATsvtFAhm0J5E04bvgzxdhZKTP29ONGMtX/tIiBcoTPCF\nZTMkVbDBeclA/TGuyCUIty1BGpqiNvesIIXQ33S7Lx3mjO3X7VwN0so0ViwUgxxV\nxJisVJiw9glsslyc49nwp9TzyoFuVRm4vYA+D07IPtiASjzC/4Lh3R1Pn0err299\nBMxFJ/0JEMTDS+r6rmZQo7+IkwykBnz37JH8TEM0nVF4ayzxP/F0u6PFN3qT9mjb\nWoZwTB8hz/zvLVJxRD31pkX0oHVYQQ/S5Z1DR3td6at1n5mJZoKzpVKq4FSQWH+J\noHFt6Z0+AEZg60wDObpRQ/Jkw/cU8zqHFhKChj81jQKBgQD2lPHXumBM68cLzpt9\nALrzaNrg3dkoFvPjyBheKr540rPfrcMCX1rIWPABQnMklHo00gaiR2ZrlDFRsb2/\n0satDt6BKaGE8fOMKLNlumd65LsawfsWiybX4X2nz+icJKIcflS5+kqkIta1uNWi\nAz/sIkH4lrr6qV03xBvHAAT7KwKBgQDycjqjFw+8uw56Pcbo0elMhdQc6//vOHWC\nm124VlSZ8htdYVqEVQI5r0eTAd6Hg7QLLAkAeIkYsBFVfIJOqPvn5raMoyOm5gVM\nGOdFgZvQB2oozF90Qq5YDzhaGAZov7Kk8kMpRp07Gdk+GU1YQPB/x4mYfpAXI5nK\neivkb4rUdQKBgQDJXEw6DLrDVe8Pl0KmS8hfKYtEAiZpdITpx+cOTv2IERhOWsla\n0J+D6AzmGmuIva8mHzTHpGLhCv1TZ0A6u1b+z5uoAmUh+asXE82cDyKd2tdoPGxc\ntnmb5UoFleSwTcIMXqW10czOSJzpfO0IBntWy4rwA7bhJxk2hvDgCwYGTQKBgEDE\ny21uZ8Hfpwp5Hn5sNYs/5V6knYbm6l2t6+enCIrn5u+XZnsbyrBmZxSa1zwUrzCc\n3vrFOLrjrn3L+XPSKRnWxMXlf0zC/n9J1971tQ5qLK4hiw6gEbtstX08Fdo9/Bec\nsNyCBNcZHLQ+Ri9hid5ZDCU1CoFj/V3eLYOlWM1RAoGAWspAHV8HQZJWvAnvc34z\nYVy9I2z9uj8aZA0gheqkURt7u3J/3Qtcdk4M0hgD9uFL7SAW6khObCFOcfKqy51+\n+f4REoFpzeuZDqNOeE6YeTbT0kRttyoSSigvmsl/OXRF/q5p0ML+q9UpYQFPzsCI\nRcezUKAjKOdvyB5PhHpxyXo=\n-----END PRIVATE KEY-----\n",
+  "client_email": "gcs-nodejs-sa@ecosense-bangkit.iam.gserviceaccount.com",
+  "client_id": "108426238147426196989",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/gcs-nodejs-sa%40ecosense-bangkit.iam.gserviceaccount.com"
+}

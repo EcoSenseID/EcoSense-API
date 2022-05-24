@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const Multer = require('multer');
 
 const db_users = require('./sql-queries/queries_users');
 const db_campaigns = require('./sql-queries/queries_campaigns');
@@ -13,6 +14,9 @@ const db_campaign_participant = require('./sql-queries/queries_campaign_particip
 
 const db_api = require('./sql-queries/queries_api');
 const db_webapi = require('./sql-queries/queries_webapi');
+
+const gcsMiddlewares = require('./middlewares/google-cloud-storage');
+const isAuthenticated = require('./middlewares/auth-middleware');
 
 // env
 const { PORT } = require('./env_config');
@@ -27,11 +31,19 @@ app.use(
     extended: true,
   })
 );
+
 const corsOptions = {
   origin: ['https://ecosense-web.herokuapp.com', 'http://localhost:3000'],
   optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 }
 app.use(cors(corsOptions));
+
+const multer = Multer({
+  storage: Multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024, // Maximum file size is 5MB
+  },
+});
 
 // Sample method
 app.get('/', (request, response) => {
@@ -102,12 +114,23 @@ app.put('/campaign_participant/:id_user/:id_category', db_campaign_participant.u
 app.delete('/campaign_participant/:id_user/:id_category', db_campaign_participant.deleteCampaignParticipantDetails);
 
 // Endpoints based on API requirements
-app.get('/campaign', db_api.getCampaign);
-app.get('/categories', db_api.getAllCategories);
-app.get('/detail/:id', db_api.getCampaignDetail);
-app.get('/profile/:id', db_api.getProfile);
+app.get('/campaign', isAuthenticated, db_api.getCampaign);
+app.get('/dashboard', isAuthenticated, db_api.getDashboard);
+app.get('/categories', isAuthenticated, db_api.getAllCategories);
+app.get('/detail', isAuthenticated, db_api.getCampaignDetail);
+app.get('/contributions', isAuthenticated, db_api.getContributions);
+app.post('/proof', isAuthenticated, db_api.postProof);
+app.post('/completecampaign', isAuthenticated, db_api.postCompleteCampaign);
+app.post('/joincampaign', isAuthenticated, db_api.joinCampaign);
 
 // Endpoints for Ecosense Web
+/**
+ * POST Request to GCS. Please input these in request body:
+ * @param {File} image
+ * @param {string} bucketName
+ * @return {string} // gcsUrl
+ */
+app.post('/uploadgcs', isAuthenticated, multer.single('image'), gcsMiddlewares.sendUploadToGCS, db_webapi.uploadFileToGCS);
 
 // Server listening for requests
 app.listen(PORT, () => {
