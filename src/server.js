@@ -12,6 +12,7 @@ const db_category_campaign = require('./sql-queries/queries_category_campaign');
 const db_campaign_participant = require('./sql-queries/queries_campaign_participant');
 
 const db_api = require('./sql-queries/queries_api');
+const db_webapi = require('./sql-queries/queries_webapi');
 
 // env
 const { PORT } = require('./env_config');
@@ -105,6 +106,8 @@ app.get('/campaign', db_api.getCampaign);
 app.get('/categories', db_api.getAllCategories);
 app.get('/detail/:id', db_api.getCampaignDetail);
 app.get('/profile/:id', db_api.getProfile);
+
+// Endpoints for Ecosense Web
 
 // Server listening for requests
 app.listen(PORT, () => {

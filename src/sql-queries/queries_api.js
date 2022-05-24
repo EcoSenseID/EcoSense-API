@@ -53,7 +53,7 @@ const getAllCategories = (request, response) => {
                 error: false,
                 message: "Categories fetched successfully",
                 categories: results.rows.map(data => ({
-                    id: data.id, photoUrl: data.photo_url, name: data.title, colorHex: data.color_hex
+                    id: data.id, photoUrl: data.photo_url, name: data.name, colorHex: data.color_hex
                 }))
             });
         });
