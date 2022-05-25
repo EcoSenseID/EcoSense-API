@@ -116,14 +116,14 @@ const getDashboard = async (request, response) => {
                     id_user: 1,
                     is_completed: false,
                     joined_timestamp: "2022-05-08T06:34:18.598Z",
-                    completed_timestamp: "2022-06-08T06:34:18.598Z"
+                    completed_timestamp: ""
                 },
                 {
                     id_campaign: 1,
                     id_user: 1,
                     is_completed: false,
                     joined_timestamp: "2022-05-08T06:34:18.598Z",
-                    completed_timestamp: "2022-06-08T06:34:18.598Z"
+                    completed_timestamp: ""
                 },
             ]
             response.status(200).json({
@@ -299,14 +299,14 @@ const getContributions = async (request, response) => {
                     id_user: 1,
                     is_completed: false,
                     joined_timestamp: "2022-05-08T06:34:18.598Z",
-                    completed_timestamp: "2022-06-08T06:34:18.598Z"
+                    completed_timestamp: ""
                 },
                 {
                     id_campaign: 1,
                     id_user: 1,
                     is_completed: false,
                     joined_timestamp: "2022-05-08T06:34:18.598Z",
-                    completed_timestamp: "2022-06-08T06:34:18.598Z"
+                    completed_timestamp: ""
                 },
             ]
             const campaignList = results[1].rows.map(data => ({
@@ -409,8 +409,7 @@ const postProof = async (request, response) => {
             if (results[1].rows.length !== 0) {
                 response.status(200).json({
                     error: false,
-                    message: "Success",
-                    data: results.rows
+                    message: "Success"
                 });
             } else {
                 response.status(400).json({
@@ -427,40 +426,76 @@ const postProof = async (request, response) => {
     }
 }
 
+// TODO: DONE!
 const postCompleteCampaign = async (request, response) => {
-    const { campaignId } = request.body;
+    const campaignId = parseInt(request.body.campaignId);
     const { authorization } = request.headers;
-    const uid = await getUid(authorization);
 
     try {
-        response.status(200).json({
-            error: false,
-            message: "Success",
-            uid: uid
+        const uid = await getUid(authorization);
+        // const id = await getIdFromUid(uid);
+        const id = 2;
+
+        const currentDate = new Date().toISOString(); 
+        const queryString = `
+            UPDATE campaign_participant 
+            SET is_completed = true, completed_timestamp = '${currentDate}'
+            WHERE id_campaign = ${campaignId} AND id_user = ${id};
+            SELECT is_completed FROM campaign_participant WHERE id_campaign = ${campaignId} AND id_user = ${id};
+        `;
+        pool.query(queryString, (error, results) => {
+            const isCompleted = results[1].rows[0].is_completed;
+            if (isCompleted) {
+                response.status(200).json({
+                    error: false, message: "Success"
+                });
+            } else {
+                response.status(400).json({
+                    error: true,
+                    message: "Update DB not successful"
+                });
+            }
         });
     }
     catch (err) {
-        response.status(error.code || 400).json({
-            error: true, message: error.message
+        response.status(err.code || 400).json({
+            error: true, message: err.message
         });
     }
 }
 
+// TODO: DONE!
 const joinCampaign = async (request, response) => {
-    const { campaignId } = request.body;
+    const campaignId = parseInt(request.body.campaignId);
     const { authorization } = request.headers;
-    const uid = await getUid(authorization);
 
     try {
-        response.status(200).json({
-            error: false,
-            message: "Success",
-            uid: uid
-        });
+        const uid = await getUid(authorization);
+        // const id = await getIdFromUid(uid);
+        const id = 2;
+
+        const currentDate = new Date().toISOString();
+        const queryString = `
+            INSERT INTO campaign_participant (id_campaign, id_user, is_completed, joined_timestamp, completed_timestamp)
+            VALUES (${campaignId}, ${id}, false, '${currentDate}', '');
+            SELECT * FROM campaign_participant WHERE id_campaign = ${campaignId} AND id_user = ${id};
+        `;
+        pool.query(queryString, (error, results) => {
+            if (results[1].rows.length !== 0) {
+                response.status(200).json({
+                    error: false, message: "Success"
+                });
+            } else {
+                response.status(400).json({
+                    error: true,
+                    message: "Insert to DB not successful"
+                });
+            }
+        })
     }
     catch (err) {
-        response.status(error.code || 400).json({
-            error: true, message: error.message
+        response.status(err.code || 400).json({
+            error: true, message: err.message
         });
     }
 }

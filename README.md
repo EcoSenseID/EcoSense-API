@@ -19,12 +19,13 @@ This is the back-end for EcoSense capstone project, which is included in the Ban
 - [x] `GET` `/categories/?campaignId={<int>}`
 - [x] `GET` `/detail`
 - [x] `GET` `/contributions`
-- [ ] `POST` `/proof`
-- [ ] `POST` `/completecampaign`
-- [ ] `POST` `/joincampaign`
+- [x] `POST` `/proof`
+- [x] `POST` `/completecampaign`
+- [x] `POST` `/joincampaign`
 
 ## Endpoints for Web
 - [x] `GET` `/trendingCampaigns`
+- [x] `GET` `/loginToWeb`
 
 ## 
 &#169; EcoSense 2022.
