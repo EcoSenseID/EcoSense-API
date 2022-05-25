@@ -14,7 +14,7 @@ This is the back-end for EcoSense capstone project, which is included in the Ban
 - [x] `/campaigns`
   - [x] `/campaigns?q={<string>}`
   - [x] `/campaigns?categoryId={<int>}`
-  - [x] `/campaigns?q={<string>&categoryId={<int>}`
+  - [x] `/campaigns?q={<string>}&categoryId={<int>}`
 - [ ] `/dashboard`
 - [x] `/categories`
 - [ ] `/detail`
