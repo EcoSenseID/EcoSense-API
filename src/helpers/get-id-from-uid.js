@@ -2,9 +2,10 @@ const pool = require('../pool');
 
 const getIdFromUid = async (uid) => {
     if (!uid) {
-        const error = new Error('No uid!');
-        error.code = 400;
-        throw error;
+        return {
+            error: true,
+            message: "No uid!"
+        }
     }
 
     try {
@@ -14,10 +15,16 @@ const getIdFromUid = async (uid) => {
             if (error) throw error;
             id = results.row
         });
-        return id;
+        return {
+            error: false,
+            id: id
+        };
     }
     catch (error) {
-        throw error;
+        return {
+            error: true,
+            message: error.message
+        }
     }
 }
 

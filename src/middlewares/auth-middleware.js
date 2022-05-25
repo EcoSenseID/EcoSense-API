@@ -30,10 +30,10 @@ const isAuthenticated = async (req, res, next) => {
         next();
     }
     catch (err) {
-        console.error(`${err.code} - ${err.message}`);
+        const errMessage = `${err.code} - ${err.message}`;
         return res.status(403).send({ 
             error: true,
-            message: 'Could not authorize' 
+            message: errMessage 
         });
     }
 }
