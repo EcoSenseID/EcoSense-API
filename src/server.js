@@ -119,7 +119,7 @@ app.get('/dashboard', isAuthenticated, db_api.getDashboard);
 app.get('/categories', isAuthenticated, db_api.getAllCategories);
 app.get('/detail', isAuthenticated, db_api.getCampaignDetail);
 app.get('/contributions', isAuthenticated, db_api.getContributions);
-app.post('/proof', isAuthenticated, db_api.postProof);
+app.post('/proof', isAuthenticated, multer.single('photo'), db_api.postProof);
 app.post('/completecampaign', isAuthenticated, db_api.postCompleteCampaign);
 app.post('/joincampaign', isAuthenticated, db_api.joinCampaign);
 

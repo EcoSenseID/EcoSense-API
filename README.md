@@ -11,20 +11,20 @@ This is the back-end for EcoSense capstone project, which is included in the Ban
 [![ExpressJS](https://img.shields.io/badge/express.js-black?style=for-the-badge&logo=express&logoColor=purple)](https://github.com/EcoSenseID?tab=repositories)
 
 ## Endpoints for Android
-- [x] `/campaigns`
-  - [x] `/campaigns?q={<string>}`
-  - [x] `/campaigns?categoryId={<int>}`
-  - [x] `/campaigns?q={<string>}&categoryId={<int>}`
-- [ ] `/dashboard`
-- [x] `/categories`
-- [ ] `/detail`
-- [ ] `/contributions`
-- [ ] `/proof`
-- [ ] `/completecampaign`
-- [ ] `/joincampaign`
+- [x] `GET` `/campaigns`
+  - [x] `GET` `/campaigns?q={<string>}`
+  - [x] `GET` `/campaigns?categoryId={<int>}`
+  - [x] `GET` `/campaigns?q={<string>}&categoryId={<int>}`
+- [x] `GET` `/dashboard`
+- [x] `GET` `/categories/?campaignId={<int>}`
+- [x] `GET` `/detail`
+- [x] `GET` `/contributions`
+- [ ] `POST` `/proof`
+- [ ] `POST` `/completecampaign`
+- [ ] `POST` `/joincampaign`
 
 ## Endpoints for Web
-- [x] `/trendingCampaigns`
+- [x] `GET` `/trendingCampaigns`
 
 ## 
 &#169; EcoSense 2022.
