@@ -131,6 +131,7 @@ app.post('/joincampaign', isAuthenticated, db_api.joinCampaign);
  * @return {string} // gcsUrl
  */
 app.post('/uploadgcs', isAuthenticated, multer.single('image'), gcsMiddlewares.sendUploadToGCS, db_webapi.uploadFileToGCS);
+app.get('/trendingCampaigns', db_webapi.getTrendingCampaigns);
 
 // Server listening for requests
 app.listen(PORT, () => {
