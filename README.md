@@ -33,11 +33,15 @@ This is the back-end for EcoSense capstone project, which is included in the Ban
 To get the most trending campaigns, you can try to access [this link](https://ecosense-bangkit.uc.r.appspot.com/trendingCampaigns).
 
 ## Google Cloud Platform Infrastructure
-- Cloud Source Repositories
+- Cloud Source Repositories `ecosense-restapi:main`
 - Cloud Build
-- Cloud Build Trigger
-- Google App Engine
-- Google Cloud Storage (for Campaign Posters and Task Completion Proof)
+- Cloud Build Trigger `ecosense-restapi`
+- Google App Engine 
+  - Service `default`
+  - Latest Version `20220526t113833` (May 26, 2022)
+- Google Cloud Storage 
+  - Bucket for Campaign Posters `ecosense-campaign-posters`
+  - Bucket for Task Completion Proof `ecosense-task-proofs`
 
 ```mermaid
 graph LR;
