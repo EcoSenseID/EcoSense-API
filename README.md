@@ -29,5 +29,22 @@ This is the back-end for EcoSense capstone project, which is included in the Ban
 - [x] `POST` `/addNewCampaign`
 - [x] `GET` `/myCampaigns`
 
+## Try the API
+To get the most trending campaigns, you can try to access [this link](https://ecosense-bangkit.uc.r.appspot.com/trendingCampaigns).
+
+## Google Cloud Platform Infrastructure
+- Cloud Source Repositories
+- Cloud Build
+- Cloud Build Trigger
+- Google App Engine
+- Google Cloud Storage (for Campaign Posters and Task Completion Proof)
+
+```mermaid
+graph LR;
+    A([Push to CSR])-->B([Cloud Build Trigger]);
+    B([Cloud Build Trigger])-->C([Run Cloud Build]);
+    C([Run Cloud Build])-->D([Google App Engine]);
+```
+
 ## 
 &#169; EcoSense 2022.
