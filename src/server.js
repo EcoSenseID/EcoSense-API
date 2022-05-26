@@ -127,6 +127,8 @@ app.post('/joincampaign', isAuthenticated, db_api.joinCampaign);
 // app.post('/uploadgcs', isAuthenticated, multer.single('image'), gcsMiddlewares.sendUploadToGCS, db_webapi.uploadFileToGCS);
 app.get('/trendingCampaigns', db_webapi.getTrendingCampaigns);
 app.get('/loginToWeb', isAuthenticated, db_webapi.loginToWeb);
+app.post('/addNewCampaign', isAuthenticated, multer.single('uploadPoster'), db_webapi.addNewCampaign);
+app.get('/myCampaigns', isAuthenticated, db_webapi.getMyCampaigns);
 
 // Server listening for requests
 app.listen(PORT, () => {

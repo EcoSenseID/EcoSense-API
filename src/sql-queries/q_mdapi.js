@@ -1,6 +1,6 @@
 const pool = require('../pool');
 const getUid = require('../firebase-auth/getUid');
-const getIdFromUid = require('../helpers/get-id-from-uid');
+const getIdFromUid = require('../helpers/get-id-check-admin');
 const { sendUploadToGCSFunc } = require('../helpers/google-cloud-storage');
 
 // TODO: DONE!
@@ -356,15 +356,13 @@ const getContributions = async (request, response) => {
 
 // TODO: DONE!
 const postProof = async (request, response) => {
-    // console.log(request.body);
-    const rawData = request.body;
     const { authorization } = request.headers;
-    const taskId = parseInt(rawData.taskId);
+    const taskId = parseInt(request.body.taskId);
     const photo = request.file;
 
     try {
         const uid = await getUid(authorization);
-        // const id = await getIdFromUid(uid);
+        // const id = await getIdFromUid(uid).id;
         const id = 2;
 
         if (!taskId) {

@@ -26,6 +26,8 @@ This is the back-end for EcoSense capstone project, which is included in the Ban
 ## Endpoints for Web
 - [x] `GET` `/trendingCampaigns`
 - [x] `GET` `/loginToWeb`
+- [x] `POST` `/addNewCampaign`
+- [x] `GET` `/myCampaigns`
 
 ## 
 &#169; EcoSense 2022.
