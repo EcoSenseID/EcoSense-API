@@ -61,40 +61,38 @@ const loginToWeb = async (request, response) => {
     const queryString1 = `
       SELECT id FROM users WHERE firebase_uid = '${uid}';
     `;
-    pool.query(queryString1, (error, results) => {
-      if (results.rows.length === 0) {
-        hasExisted = false;
-      } else {
-        hasExisted = true;
+    const results1 = await pool.query(queryString1);
+    if (results1.rows.length === 0) {
+      hasExisted = false;
+    } else {
+      hasExisted = true;
+      response.status(200).json({
+        error: false,
+        message: "UID existed. Login success!"
+      });
+      return;
+    }
+
+    if (!hasExisted) {
+      const queryString2 = `
+        INSERT INTO users (firebase_uid) VALUES ('${uid}') RETURNING id;
+        INSERT INTO user_role (id_user, id_role) SELECT id, 1 FROM users WHERE firebase_uid = '${uid}' RETURNING id_user;
+      `;
+      const results2 = await pool.query(queryString2);
+      if (results2[0].rows[0].id === results2[1].rows[0].id_user){
         response.status(200).json({
           error: false,
-          message: "UID existed. Login success!"
+          message: "Add UID and login to Web success!"
+        });
+        return;
+      } else {
+        response.status(400).json({
+          error: false,
+          message: "Add UID failed but login to Web success!"
         });
         return;
       }
-
-      if (!hasExisted) {
-        const queryString2 = `
-          INSERT INTO users (firebase_uid) VALUES ('${uid}') RETURNING id;
-          INSERT INTO user_role (id_user, id_role) SELECT id, 1 FROM users WHERE firebase_uid = '${uid}' RETURNING id_user;
-        `;
-        pool.query(queryString2, (error, results) => {
-          if (results[0].rows[0].id === results[1].rows[0].id_user){
-            response.status(200).json({
-              error: false,
-              message: "Add UID and login to Web success!"
-            });
-            return;
-          } else {
-            response.status(400).json({
-              error: false,
-              message: "Add UID failed but login to Web success!"
-            });
-            return;
-          }
-        });
-      }
-    });
+    }
   }
   catch(error) {
     response.status(error.code || 400).json({
@@ -180,7 +178,6 @@ const addNewCampaign = async (request, response) => {
 const getMyCampaigns = async (request, response) => {
   const { authorization } = request.headers;
   const { displayName } = request.query;
-  // console.log(request.query.displayName);
 
   try {
     const uid = await getUid(authorization);
