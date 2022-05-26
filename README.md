@@ -25,7 +25,7 @@ This is the back-end for EcoSense capstone project, which is included in the Ban
 
 ## Endpoints for Web
 - [x] `GET` `/trendingCampaigns`
-- [x] `GET` `/loginToWeb`
+- [x] `POST` `/loginToWeb`
 - [x] `POST` `/addNewCampaign`
 - [x] `GET` `/myCampaigns`
 
@@ -38,7 +38,7 @@ To get the most trending campaigns, you can try to access [this link](https://ec
 - Cloud Build Trigger `ecosense-restapi`
 - Google App Engine 
   - Service `default`
-  - Latest Version `20220526t113833` (May 26, 2022)
+  - Latest Version `20220526t165900` (May 26, 2022)
 - Google Cloud Storage 
   - Bucket for Campaign Posters `ecosense-campaign-posters`
   - Bucket for Task Completion Proof `ecosense-task-proofs`
