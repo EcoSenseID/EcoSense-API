@@ -1,7 +1,7 @@
 # EcoSense App API
 
 ## Introduction
-A RESTful API built with ExpressJS for CRUD operation.\
+A RESTful API built with ExpressJS and TypeScript for CRUD operation.\
 This is the back-end for EcoSense capstone project, which is included in the Bangkit Academy 2022 program.
 
 ## Technologies
@@ -38,7 +38,7 @@ To get the most trending campaigns, you can try to access [this link](https://ec
 - Cloud Build Trigger `ecosense-restapi`
 - Google App Engine 
   - Service `default`
-  - Latest Version `20220526t165900` (May 26, 2022)
+  - Latest Version `20220527t075709` (May 27, 2022)
 - Google Cloud Storage 
   - Bucket for Campaign Posters `ecosense-campaign-posters`
   - Bucket for Task Completion Proof `ecosense-task-proofs`
