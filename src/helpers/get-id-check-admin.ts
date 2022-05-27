@@ -1,6 +1,6 @@
 import pool from '../pool';
 
-const getIdcheckAdminFromUid = async (uid: String) => {
+const getIdCheckAdminFromUid = async (uid: String) => {
     // console.log('uid getID', uid);
     if (!uid) {
         return { error: true, message: "No uid!" }
@@ -10,13 +10,13 @@ const getIdcheckAdminFromUid = async (uid: String) => {
         const queryString = `SELECT id FROM users WHERE firebase_uid = '${uid}';`;
         const results = await pool.query(queryString);
         // if (error) throw error;
-        const id = results.rows[0].id;
+        const id = parseInt(results.rows[0].id);
         // console.log('id getId', id);
         
         if (!id) {
             return { error: true, message: 'User not found!' }
         } else {
-            const queryString1 = ` SELECT id_role FROM user_role WHERE id_user = ${parseInt(id)}`;
+            const queryString1 = ` SELECT id_role FROM user_role WHERE id_user = ${id}`;
             const results = await pool.query(queryString1); 
             const isAdmin = results.rows[0].id_role === 1;
             // console.log('results', results.rows);
@@ -37,4 +37,4 @@ const getIdcheckAdminFromUid = async (uid: String) => {
 }
 
 // module.exports = getIdcheckAdminFromUid;
-export default getIdcheckAdminFromUid;
+export default getIdCheckAdminFromUid;

@@ -9,6 +9,9 @@ This is the back-end for EcoSense capstone project, which is included in the Ban
 [![NPM](https://img.shields.io/badge/NPM-%23000000.svg?style=for-the-badge&logo=npm&logoColor=white)](https://github.com/EcoSenseID?tab=repositories)
 [![NodeJS](https://img.shields.io/badge/node.js-black?style=for-the-badge&logo=node.js&logoColor=6DA55F)](https://github.com/EcoSenseID?tab=repositories)
 [![ExpressJS](https://img.shields.io/badge/express.js-black?style=for-the-badge&logo=express&logoColor=purple)](https://github.com/EcoSenseID?tab=repositories)
+[![TypeScript](https://img.shields.io/badge/typescript-black?style=for-the-badge&logo=typescript&logoColor=%23007ACC)](https://github.com/EcoSenseID?tab=repositories&language=typescript)
+[![Postgres](https://img.shields.io/badge/postgres-black.svg?style=for-the-badge&logo=postgresql&logoColor=%23316192)](https://github.com/EcoSenseID?tab=repositories)
+[![Google Cloud](https://img.shields.io/badge/GoogleCloud-black.svg?style=for-the-badge&logo=google-cloud&logoColor=%234285F4)](https://github.com/EcoSenseID?tab=repositories)
 
 ## Endpoints for Android
 - [x] `GET` `/campaigns`
@@ -22,10 +25,11 @@ This is the back-end for EcoSense capstone project, which is included in the Ban
 - [x] `POST` `/proof`
 - [x] `POST` `/completecampaign`
 - [x] `POST` `/joincampaign`
+- [x] `POST` `/loginToMobile` &#8594; call only when login with Google or sign up with Email & Password
 
 ## Endpoints for Web
 - [x] `GET` `/trendingCampaigns`
-- [x] `POST` `/loginToWeb`
+- [x] `POST` `/loginToWeb` &#8594; call only when login with Google or sign up with Email & Password
 - [x] `POST` `/addNewCampaign`
 - [x] `GET` `/myCampaigns`
 

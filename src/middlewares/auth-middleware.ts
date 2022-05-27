@@ -39,4 +39,4 @@ const isAuthenticated = async (req: Request, res: Response, next: NextFunction) 
     }
 }
 
-module.exports = isAuthenticated;
+export default isAuthenticated;

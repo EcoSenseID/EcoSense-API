@@ -3,11 +3,11 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import Multer from 'multer';
 
-const db_api = require('./sql-queries/q_mdapi');
-const db_webapi = require('./sql-queries/q_webapi');
+import * as db_api from './sql-queries/q_mdapi';
+import * as db_webapi from './sql-queries/q_webapi';
 
-const gcsMiddlewares = require('./middlewares/google-cloud-storage');
-const isAuthenticated = require('./middlewares/auth-middleware');
+// import * as gcsMiddlewares from './middlewares/google-cloud-storage';
+import isAuthenticated from './middlewares/auth-middleware';
 
 // env
 import { PORT } from './env_config';
@@ -60,6 +60,7 @@ app.get('/contributions', isAuthenticated, db_api.getContributions);
 app.post('/proof', isAuthenticated, multer.single('photo'), db_api.postProof);
 app.post('/completecampaign', isAuthenticated, db_api.postCompleteCampaign);
 app.post('/joincampaign', isAuthenticated, db_api.joinCampaign);
+app.post('/loginToMobile', isAuthenticated, db_api.loginToMobile);
 
 // Endpoints for Ecosense Web
 // app.post('/uploadgcs', isAuthenticated, multer.single('image'), gcsMiddlewares.sendUploadToGCS, db_webapi.uploadFileToGCS);

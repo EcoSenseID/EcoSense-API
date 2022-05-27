@@ -1,6 +1,6 @@
 import pool from '../pool';
 import getUid from '../firebase-auth/getUid';
-import getIdcheckAdminFromUid from '../helpers/get-id-check-admin';
+import getIdCheckAdminFromUid from '../helpers/get-id-check-admin';
 import { sendUploadToGCSFunc } from '../helpers/google-cloud-storage';
 
 import { Request, Response } from 'express';
@@ -112,7 +112,7 @@ export const addNewCampaign = async (request: Request, response: Response) => {
 
   try {
     const uid = await getUid(authorization!);
-    const checkResult = await getIdcheckAdminFromUid(uid);
+    const checkResult = await getIdCheckAdminFromUid(uid);
     const isAdmin = checkResult.isAdmin;
     const id = checkResult.id;
 
@@ -186,7 +186,7 @@ export const getMyCampaigns = async (request: Request, response: Response) => {
 
   try {
     const uid = await getUid(authorization!);
-    const checkResult = await getIdcheckAdminFromUid(uid);
+    const checkResult = await getIdCheckAdminFromUid(uid);
     const isAdmin = checkResult.isAdmin;
     const id = checkResult.id;
 
