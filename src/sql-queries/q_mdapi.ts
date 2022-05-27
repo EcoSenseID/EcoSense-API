@@ -1,11 +1,13 @@
-const pool = require('../pool');
-const getUid = require('../firebase-auth/getUid');
-const getIdFromUid = require('../helpers/get-id-check-admin');
-const { sendUploadToGCSFunc } = require('../helpers/google-cloud-storage');
+import pool from '../pool';
+import getUid from '../firebase-auth/getUid';
+import getIdcheckUserFromUid from '../helpers/get-id-check-user';
+import { sendUploadToGCSFunc } from '../helpers/google-cloud-storage';
+import { Request, Response } from 'express';
 
 // TODO: DONE!
-const getCampaign = async (request, response) => {
-    const categoryId = parseInt(request.query.categoryId) || null;
+export const getCampaign = async (request: Request, response: Response) => {
+    const reqQuery: any = request.query;
+    const categoryId: any = parseInt(reqQuery.categoryId) || null;
     const keyword = request.query.q || '';
 
     try {
@@ -20,14 +22,14 @@ const getCampaign = async (request, response) => {
             ORDER BY id;
         `;
         // Fitur filter by categoryId pending, menunggu data category masuk ke DB.
-        pool.query(queryString, (error, results) => {
+        pool.query(queryString, (error: Error, results: any) => {
             // console.log(results[0].rows);
-            const categoriesList = results[0].rows.map(data => ({
+            const categoriesList = results[0].rows.map((data: { id: number; name: string; }) => ({
                 id: data.id, name: data.name
             }))
             let campaignsList = [];
             if (categoryId) {
-                campaignsList = results[1].rows.filter(data => (data.category || []).includes(categoryId));
+                campaignsList = results[1].rows.filter((data: { category: Array<number>; }) => (data.category || []).includes(categoryId));
             } else {
                 campaignsList = results[1].rows;
             }
@@ -35,15 +37,15 @@ const getCampaign = async (request, response) => {
                 error: false,
                 message: "Campaigns fetched successfully",
                 timestamp: new Date(),
-                campaigns: campaignsList.map(data => ({
+                campaigns: campaignsList.map((data: any) => ({
                     id: data.id,
                     posterUrl: data.poster_url,
                     title: data.title,
                     description: data.description,
                     startDate: data.start_date,
                     endDate: data.end_date,
-                    category: (data.category || []).map((data, idx) => (
-                        categoriesList.filter(category => category.id === data)[0].name
+                    category: (data.category || []).map((data: number) => (
+                        categoriesList.filter((category: { id: number; }) => category.id === data)[0].name
                     )),
                     participantsCount: data.participant_count || 0,
                     isTrending: !data.participant_count ? false : data.participant_count > 1000 ? true : false,
@@ -54,7 +56,7 @@ const getCampaign = async (request, response) => {
             // if (error) throw error;
         })
     }
-    catch(error) {
+    catch(error: any) {
         response.status(error.code || 400).json({
             error: true, message: error.message
         });
@@ -62,11 +64,11 @@ const getCampaign = async (request, response) => {
 }
 
 // TODO: Activate getIdFromUid and change completedCampaignList from dummy data to database
-const getDashboard = async (request, response) => {
+export const getDashboard = async (request: Request, response: Response) => {
     const { authorization } = request.headers;
 
     try {
-        const uid = await getUid(authorization);
+        const uid = await getUid(authorization!);
         // const id = await getIdFromUid(uid);
         const id = 1;
 
@@ -82,25 +84,25 @@ const getDashboard = async (request, response) => {
             SELECT * FROM tasks ORDER BY id_campaign;
             SELECT id_task FROM completed_tasks WHERE id_user = ${id} ORDER BY id_task;
         `;
-        pool.query(queryString, (error, results) => {
+        pool.query(queryString, (error: Error, results: any) => {
             // if (error) throw error;
-            const categoriesList = results[0].rows.map(data => ({
+            const categoriesList = results[0].rows.map((data: { id: number; name: string; }) => ({
                 id: data.id, name: data.name
             }))
-            const campaignList = results[1].rows.map(data => ({
+            const campaignList = results[1].rows.map((data: any) => ({
                 id: data.id,
                 posterUrl: data.poster_url,
                 title: data.title,
                 endDate: data.end_date,
-                category: (data.category || []).map((data, idx) => (
-                    categoriesList.filter(category => category.id === data)[0].name
+                category: (data.category || []).map((data: number) => (
+                    categoriesList.filter((category: { id: number; }) => category.id === data)[0].name
                 )),
                 participantsCount: data.participant_count || 0,
                 isTrending: !data.participant_count ? false : data.participant_count > 1000 ? true : false,
                 isNew: Math.round((new Date().getTime() - data.start_date.getTime())/(1000*60*60*24)) <= 7
             }));
             const taskList = results[3].rows;
-            const completedTaskList = results[4].rows.map(data => (data.id_task));
+            const completedTaskList = results[4].rows.map((data: { id_task: number; }) => (data.id_task));
             // console.log(completedTaskList);
             // const completedCampaignsList = results[2].row;
             const completedCampaignsList = [
@@ -133,13 +135,13 @@ const getDashboard = async (request, response) => {
                     ...completedCampaignsList.filter(data => data.is_completed == false).map(data => ({
                         id: 1,
                         campaignId: data.id_campaign,
-                        name: taskList.filter(task => task.id_campaign == data.id_campaign).filter(task => {
+                        name: taskList.filter((task: { id_campaign: number; }) => task.id_campaign == data.id_campaign).filter((task: { id: number; }) => {
                             if (completedTaskList.includes(task.id)) return false;
                             return true;
                         })[0].name,
-                        campaignName: campaignList.filter(campaign => campaign.id == data.id_campaign)[0].title,
-                        campaignEndDate: campaignList.filter(campaign => campaign.id == data.id_campaign)[0].endDate,
-                        tasksLeft: taskList.filter(task => task.id_campaign == data.id_campaign).filter(task => {
+                        campaignName: campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0].title,
+                        campaignEndDate: campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0].endDate,
+                        tasksLeft: taskList.filter((task: { id_campaign: number; }) => task.id_campaign == data.id_campaign).filter((task: { id: number; }) => {
                             if (completedTaskList.includes(task.id)) return false;
                             return true;
                         }).length,
@@ -149,19 +151,19 @@ const getDashboard = async (request, response) => {
                 completedCampaigns: [
                     ...completedCampaignsList.filter(data => data.is_completed == true).map(data => ({
                         id: data.id_campaign,
-                        posterUrl: campaignList.filter(campaign => campaign.id == data.id_campaign)[0].posterUrl,
-                        title: campaignList.filter(campaign => campaign.id == data.id_campaign)[0].title,
-                        endDate: campaignList.filter(campaign => campaign.id == data.id_campaign)[0].endDate,
-                        category: campaignList.filter(campaign => campaign.id == data.id_campaign)[0].category,
-                        participantsCount: campaignList.filter(campaign => campaign.id == data.id_campaign)[0].participantsCount,
-                        isTrending: campaignList.filter(campaign => campaign.id == data.id_campaign)[0].isTrending,
-                        isNew: campaignList.filter(campaign => campaign.id == data.id_campaign)[0].isNew
+                        posterUrl: campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0].posterUrl,
+                        title: campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0].title,
+                        endDate: campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0].endDate,
+                        category: campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0].category,
+                        participantsCount: campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0].participantsCount,
+                        isTrending: campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0].isTrending,
+                        isNew: campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0].isNew
                     }))
                 ]
             });
         });
     }
-    catch (err) {
+    catch (error: any) {
         response.status(error.code || 400).json({
             error: true, message: error.message
         });
@@ -169,21 +171,21 @@ const getDashboard = async (request, response) => {
 }
 
 // TODO: DONE!
-const getAllCategories = (request, response) => {
+export const getAllCategories = (request: Request, response: Response) => {
     try {
         const queryString = `SELECT * FROM categories ORDER BY id;`;
-        pool.query(queryString, (error, results) => {
+        pool.query(queryString, (error: Error, results: any) => {
             response.status(200).json({
                 error: false,
                 message: "Categories fetched successfully",
-                categories: results.rows.map(data => ({
+                categories: results.rows.map((data: { id: number; photo_url: string; name: string; color_hex: string; }) => ({
                     id: data.id, photoUrl: data.photo_url, name: data.name, colorHex: data.color_hex
                 }))
             });
             if (error) throw error;
         });
     }
-    catch(error) {
+    catch(error: any) {
         response.status(error.code || 400).json({
             error: true, message: error.message
         });
@@ -191,16 +193,17 @@ const getAllCategories = (request, response) => {
 }
 
 // TODO: Activate getIdFromUid and change completedCampaignList from dummy data to database
-const getCampaignDetail = async (request, response) => {
+export const getCampaignDetail = async (request: Request, response: Response) => {
     const { authorization } = request.headers;
-    const campaignId = parseInt(request.query.id);
+    const reqQuery: any = request.query;
+    const campaignId = parseInt(reqQuery.id);
 
     if (!campaignId) {
         response.status(400).json({ error: true, message: "No campaign id!" });
         return;
     }
     try {
-        const uid = await getUid(authorization);
+        const uid = await getUid(authorization!);
         // const id = await getIdFromUid(uid);
         const id = 1;
 
@@ -216,7 +219,7 @@ const getCampaignDetail = async (request, response) => {
             SELECT * FROM categories ORDER BY id;
             SELECT id_campaign FROM campaign_participant WHERE id_user = ${id}
         `;
-        pool.query(queryString, (error, results) => {
+        pool.query(queryString, (error: Error, results: any) => {
             const categoriesList = results[1].rows;
             // const campaign_participant = results[2].rows;
             const campaign_participant = [
@@ -235,10 +238,10 @@ const getCampaignDetail = async (request, response) => {
             response.status(200).json({
                 error: false,
                 message: "Categories fetched successfully",
-                ...results[0].rows.map(data => ({
+                ...results[0].rows.map((data: any) => ({
                     participantsCount: data.participant_count || 0,
-                    category: (data.category || []).map((data, idx) => (
-                        categoriesList.filter(category => category.id === data)[0].name
+                    category: (data.category || []).map((data: number) => (
+                        categoriesList.filter((category: { id: number; }) => category.id === data)[0].name
                     )),
                     title: data.title,
                     posterUrl: data.poster_url,
@@ -254,7 +257,7 @@ const getCampaignDetail = async (request, response) => {
             });
         });
     }
-    catch(error) {
+    catch(error: any) {
         response.status(error.code || 400).json({
             error: true, message: error.message
         });
@@ -262,11 +265,11 @@ const getCampaignDetail = async (request, response) => {
 }
 
 // Activate getIdFromUid and change completedCampaignList from dummy data to database
-const getContributions = async (request, response) => {
+export const getContributions = async (request: Request, response: Response) => {
     const { authorization } = request.headers;
 
     try {
-        const uid = await getUid(authorization);
+        const uid = await getUid(authorization!);
         // const id = await getIdFromUid(uid);
         const id = 1;
 
@@ -281,9 +284,9 @@ const getContributions = async (request, response) => {
             SELECT * FROM campaign_participant WHERE id_user = ${id} ORDER BY id_campaign;
             SELECT * FROM user_experience_points WHERE id_user = ${id} ORDER BY id_category;
         `;
-        pool.query(queryString, (error, results) => {
-            const categoriesList = results[0].rows.map(data => ({
-                id: data.id, name: data.name
+        pool.query(queryString, (error: Error, results: any) => {
+            const categoriesList = results[0].rows.map((data: { id: number; name: string; }) => ({
+                id: data.id, name: data.name,
             }))
             // const campaign_participant = results[2].row;
             const campaign_participant = [
@@ -309,20 +312,20 @@ const getContributions = async (request, response) => {
                     completed_timestamp: ""
                 },
             ]
-            const campaignList = results[1].rows.map(data => ({
+            const campaignList = results[1].rows.map((data: any) => ({
                 id: data.id,
                 posterUrl: data.poster_url,
                 title: data.title,
                 endDate: data.end_date,
-                category: (data.category || []).map((data, idx) => (
-                    categoriesList.filter(category => category.id === data)[0].name
+                category: (data.category || []).map((data: number) => (
+                    categoriesList.filter((category: { id: number; }) => category.id === data)[0].name
                 )),
                 participantsCount: data.participant_count || 0,
                 isTrending: !data.participant_count ? false : data.participant_count > 1000 ? true : false,
                 isNew: Math.round((new Date().getTime() - data.start_date.getTime())/(1000*60*60*24)) <= 7
             }));
-            const experiencePoints = results[3].rows.map(data => ({
-                categoryName: categoriesList.filter(category => category.id === data.id_category)[0].name,
+            const experiencePoints = results[3].rows.map((data: any) => ({
+                categoryName: categoriesList.filter((category: { id: number; }) => category.id === data.id_category)[0].name,
                 level: Math.floor(data.experience_point/100),
                 currentExperience: data.experience_point % 100, // setiap level itu 100 points
                 levelExperience: 100
@@ -334,20 +337,20 @@ const getContributions = async (request, response) => {
                 completedCampaigns: [
                     ...campaign_participant.filter(data => data.is_completed == true).map(data => ({
                         id: data.id_campaign,
-                        posterUrl: campaignList.filter(campaign => campaign.id == data.id_campaign)[0].posterUrl,
-                        title: campaignList.filter(campaign => campaign.id == data.id_campaign)[0].title,
-                        endDate: campaignList.filter(campaign => campaign.id == data.id_campaign)[0].endDate,
-                        category: campaignList.filter(campaign => campaign.id == data.id_campaign)[0].category,
-                        participantsCount: campaignList.filter(campaign => campaign.id == data.id_campaign)[0].participantsCount,
-                        isTrending: campaignList.filter(campaign => campaign.id == data.id_campaign)[0].isTrending,
-                        isNew: campaignList.filter(campaign => campaign.id == data.id_campaign)[0].isNew
+                        posterUrl: campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0].posterUrl,
+                        title: campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0].title,
+                        endDate: campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0].endDate,
+                        category: campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0].category,
+                        participantsCount: campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0].participantsCount,
+                        isTrending: campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0].isTrending,
+                        isNew: campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0].isNew
                     }))
                 ]
             });
             if (error) throw error;
         });
     }
-    catch(error) {
+    catch(error: any) {
         response.status(error.code || 400).json({
             error: true, message: error.message
         });
@@ -355,13 +358,13 @@ const getContributions = async (request, response) => {
 }
 
 // TODO: DONE!
-const postProof = async (request, response) => {
+export const postProof = async (request: Request, response: Response) => {
     const { authorization } = request.headers;
     const taskId = parseInt(request.body.taskId);
     const photo = request.file;
 
     try {
-        const uid = await getUid(authorization);
+        const uid = await getUid(authorization!);
         // const id = await getIdFromUid(uid).id;
         const id = 2;
 
@@ -373,7 +376,7 @@ const postProof = async (request, response) => {
         // Check if the task requires proof or not
         const queryString1 = `SELECT require_proof FROM tasks WHERE id = ${taskId};`;
         let require_proof = true;
-        pool.query(queryString1, (error, results) => {
+        pool.query(queryString1, (error: Error, results: any) => {
             require_proof = results.rows[0].require_proof;
         });
         
@@ -387,12 +390,12 @@ const postProof = async (request, response) => {
             // Upload file to GCS and retrieve URL
             const result = await sendUploadToGCSFunc(photo, 'ecosense-task-proofs');
             if (result.error) {
-                throw result.error.errorDetail
+                throw result.error
             } else {
                 photoGCSURL = result.gcsUrl
             }
         } else {
-            photoGCSURL = null;
+            photoGCSURL = '';
         }
 
         const currentDate = new Date().toISOString();
@@ -402,7 +405,7 @@ const postProof = async (request, response) => {
             SELECT * FROM completed_tasks WHERE photo_url = '${photoGCSURL}';
         `;
         // console.log(queryString2);
-        pool.query(queryString2, (error, results) => {
+        pool.query(queryString2, (error: Error, results: any) => {
             // console.log(results);
             if (results[1].rows.length !== 0) {
                 response.status(200).json({
@@ -417,7 +420,7 @@ const postProof = async (request, response) => {
             }
         });
     }
-    catch (err) {
+    catch (err: any) {
         response.status(err.code || 400).json({
             error: true, message: err.message
         });
@@ -425,12 +428,12 @@ const postProof = async (request, response) => {
 }
 
 // TODO: DONE!
-const postCompleteCampaign = async (request, response) => {
+export const postCompleteCampaign = async (request: Request, response: Response) => {
     const campaignId = parseInt(request.body.campaignId);
     const { authorization } = request.headers;
 
     try {
-        const uid = await getUid(authorization);
+        const uid = await getUid(authorization!);
         // const id = await getIdFromUid(uid);
         const id = 2;
 
@@ -441,7 +444,7 @@ const postCompleteCampaign = async (request, response) => {
             WHERE id_campaign = ${campaignId} AND id_user = ${id};
             SELECT is_completed FROM campaign_participant WHERE id_campaign = ${campaignId} AND id_user = ${id};
         `;
-        pool.query(queryString, (error, results) => {
+        pool.query(queryString, (error: Error, results: any) => {
             const isCompleted = results[1].rows[0].is_completed;
             if (isCompleted) {
                 response.status(200).json({
@@ -455,7 +458,7 @@ const postCompleteCampaign = async (request, response) => {
             }
         });
     }
-    catch (err) {
+    catch (err: any) {
         response.status(err.code || 400).json({
             error: true, message: err.message
         });
@@ -463,12 +466,12 @@ const postCompleteCampaign = async (request, response) => {
 }
 
 // TODO: DONE!
-const joinCampaign = async (request, response) => {
+export const joinCampaign = async (request: Request, response: Response) => {
     const campaignId = parseInt(request.body.campaignId);
     const { authorization } = request.headers;
 
     try {
-        const uid = await getUid(authorization);
+        const uid = await getUid(authorization!);
         // const id = await getIdFromUid(uid);
         const id = 2;
 
@@ -478,7 +481,7 @@ const joinCampaign = async (request, response) => {
             VALUES (${campaignId}, ${id}, false, '${currentDate}', '');
             SELECT * FROM campaign_participant WHERE id_campaign = ${campaignId} AND id_user = ${id};
         `;
-        pool.query(queryString, (error, results) => {
+        pool.query(queryString, (error: Error, results: any) => {
             if (results[1].rows.length !== 0) {
                 response.status(200).json({
                     error: false, message: "Success"
@@ -491,20 +494,20 @@ const joinCampaign = async (request, response) => {
             }
         })
     }
-    catch (err) {
+    catch (err: any) {
         response.status(err.code || 400).json({
             error: true, message: err.message
         });
     }
 }
 
-module.exports = {
-    getCampaign,
-    getDashboard,
-    getAllCategories,
-    getCampaignDetail,
-    getContributions,
-    postProof,
-    postCompleteCampaign,
-    joinCampaign
-}
+// module.exports = {
+//     getCampaign,
+//     getDashboard,
+//     getAllCategories,
+//     getCampaignDetail,
+//     getContributions,
+//     postProof,
+//     postCompleteCampaign,
+//     joinCampaign
+// }

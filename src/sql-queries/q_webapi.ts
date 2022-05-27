@@ -1,8 +1,9 @@
-const pool = require('../pool');
-const getUid = require('../firebase-auth/getUid');
-const getIdcheckAdminFromUid = require('../helpers/get-id-check-admin');
-const { sendUploadToGCSFunc } = require('../helpers/google-cloud-storage');
-// const checkIsAdmin = require('../helpers/check-is-admin');
+import pool from '../pool';
+import getUid from '../firebase-auth/getUid';
+import getIdcheckAdminFromUid from '../helpers/get-id-check-admin';
+import { sendUploadToGCSFunc } from '../helpers/google-cloud-storage';
+
+import { Request, Response } from 'express';
 
 // const uploadFileToGCS = (req, res, next) => {
 //     if (req.file && req.file.gcsUrl) {
@@ -19,7 +20,7 @@ const { sendUploadToGCSFunc } = require('../helpers/google-cloud-storage');
 //     });
 // }
 
-const getTrendingCampaigns = (request, response) => {
+export const getTrendingCampaigns = (request: Request, response: Response) => {
     try {
       const queryString = `
           SELECT * FROM campaigns
@@ -29,12 +30,12 @@ const getTrendingCampaigns = (request, response) => {
           ON campaigns.id = b.id_campaign
           ORDER BY id;
       `;
-      pool.query(queryString, (error, results) => {
+      pool.query(queryString, (error: Error, results: any) => {
         // if (error) throw error;
         response.status(200).json({
             error: false,
             message: "Trending campaigns fetched successfully",
-            campaigns: results.rows.map(data => ({
+            campaigns: results.rows.map((data: { id: number; poster_url: string; title: string; description: string; }) => ({
               id: data.id,
               posterUrl: data.poster_url,
               title: data.title,
@@ -43,18 +44,18 @@ const getTrendingCampaigns = (request, response) => {
         });
       })
     }
-    catch (error) {
+    catch (error: any) {
       response.status(error.code || 400).json({
         error: true, message: error.message
       });
     }
 };
 
-const loginToWeb = async (request, response) => {
+export const loginToWeb = async (request: Request, response: Response) => {
   const { authorization } = request.headers;
 
   try {
-    const uid = await getUid(authorization);
+    const uid = await getUid(authorization!);
 
     // CHECK IF UID EXISTS IN TABLE
     let hasExisted = false;
@@ -78,7 +79,7 @@ const loginToWeb = async (request, response) => {
         INSERT INTO users (firebase_uid) VALUES ('${uid}') RETURNING id;
         INSERT INTO user_role (id_user, id_role) SELECT id, 1 FROM users WHERE firebase_uid = '${uid}' RETURNING id_user;
       `;
-      const results2 = await pool.query(queryString2);
+      const results2: any = await pool.query(queryString2);
       if (results2[0].rows[0].id === results2[1].rows[0].id_user){
         response.status(200).json({
           error: false,
@@ -94,14 +95,14 @@ const loginToWeb = async (request, response) => {
       }
     }
   }
-  catch(error) {
+  catch(error: any) {
     response.status(error.code || 400).json({
       error: true, message: error.message
     });
   }
 }
 
-const addNewCampaign = async (request, response) => {
+export const addNewCampaign = async (request: Request, response: Response) => {
   const { authorization } = request.headers;
   // console.log('reqbody', request.body);
   const newCampaignData = JSON.parse(request.body.newCampaignData);
@@ -110,7 +111,7 @@ const addNewCampaign = async (request, response) => {
   // console.log('poster', posterFile);
 
   try {
-    const uid = await getUid(authorization);
+    const uid = await getUid(authorization!);
     const checkResult = await getIdcheckAdminFromUid(uid);
     const isAdmin = checkResult.isAdmin;
     const id = checkResult.id;
@@ -134,7 +135,7 @@ const addNewCampaign = async (request, response) => {
       } else {
         const result = await sendUploadToGCSFunc(posterFile, 'ecosense-campaign-posters');
         if (result.error) {
-          throw result.error.errorDetail
+          throw result.error
         } else {
           posterGCSURL = result.gcsUrl
         }
@@ -143,11 +144,15 @@ const addNewCampaign = async (request, response) => {
       const queryString = `INSERT INTO campaigns (title, initiator, description, start_date, end_date, poster_url)
         VALUES ('${campaignTitle}', '${campaignInitiator}', '${campaignDescription}', '${campaignStartDate}', '${campaignEndDate}', '${posterGCSURL}')
         RETURNING id;
-        ${campaignCategories.map(data => (`INSERT INTO category_campaign (id_category, id_campaign, earned_experience_point) SELECT ${data.id}, id, ${data.earned_experience_point} FROM campaigns WHERE poster_url = '${posterGCSURL}';`)).join(' ')}
-        ${campaignTasks.map(data => (`INSERT INTO tasks (id_campaign, order_number, name, require_proof) SELECT id, ${data.order_number}, '${data.name}', ${data.require_proof} FROM campaigns WHERE poster_url = '${posterGCSURL}';`)).join(' ')}
+        ${campaignCategories.map((data: { id: number; earned_experience_point: number; }) => 
+          (`INSERT INTO category_campaign (id_category, id_campaign, earned_experience_point) SELECT ${data.id}, id, ${data.earned_experience_point} FROM campaigns WHERE poster_url = '${posterGCSURL}';`)
+        ).join(' ')}
+        ${campaignTasks.map((data: { order_number: number; name: string; require_proof: boolean; }) => 
+          (`INSERT INTO tasks (id_campaign, order_number, name, require_proof) SELECT id, ${data.order_number}, '${data.name}', ${data.require_proof} FROM campaigns WHERE poster_url = '${posterGCSURL}';`)
+        ).join(' ')}
       `;
       // console.log(queryString);
-      const results = await pool.query(queryString);
+      const results: any = await pool.query(queryString);
       if (results[0].rows[0].id){
         response.status(200).json({
           error: false, 
@@ -168,19 +173,19 @@ const addNewCampaign = async (request, response) => {
       return;
     }
   }
-  catch (error) {
+  catch (error: any) {
     response.status(error.code || 400).json({
       error: true, message: error.message
     }); return;
   }
 }
 
-const getMyCampaigns = async (request, response) => {
+export const getMyCampaigns = async (request: Request, response: Response) => {
   const { authorization } = request.headers;
   const { displayName } = request.query;
 
   try {
-    const uid = await getUid(authorization);
+    const uid = await getUid(authorization!);
     const checkResult = await getIdcheckAdminFromUid(uid);
     const isAdmin = checkResult.isAdmin;
     const id = checkResult.id;
@@ -203,9 +208,9 @@ const getMyCampaigns = async (request, response) => {
         ORDER BY id;
       `;
       // console.log(queryString);
-      const results = await pool.query(queryString);
+      const results: any = await pool.query(queryString);
       if (results) {
-        const categoriesList = results[0].rows.map(data => ({
+        const categoriesList = results[0].rows.map((data: { id: number; name: string; }) => ({
             id: data.id, name: data.name
         }))
         const campaignsList = results[1].rows;
@@ -215,15 +220,15 @@ const getMyCampaigns = async (request, response) => {
             error: false,
             message: "Campaigns fetched successfully",
             timestamp: new Date(),
-            campaigns: campaignsList.map(data => ({
+            campaigns: campaignsList.map((data: any) => ({
                 id: data.id,
                 posterUrl: data.poster_url,
                 title: data.title,
                 description: data.description,
                 startDate: data.start_date,
                 endDate: data.end_date,
-                category: (data.category || []).map((data, idx) => (
-                    categoriesList.filter(category => category.id === data)[0].name
+                category: (data.category || []).map((data: number) => (
+                    categoriesList.filter((category: { id: number; }) => category.id === data)[0].name
                 )),
                 participantsCount: data.participant_count || 0,
                 isTrending: !data.participant_count ? false : data.participant_count > 1000 ? true : false,
@@ -237,7 +242,7 @@ const getMyCampaigns = async (request, response) => {
       }
     }
   }
-  catch (error) {
+  catch (error: any) {
     response.status(400).json({
       error: true, message: error.message
     }); 
@@ -245,10 +250,9 @@ const getMyCampaigns = async (request, response) => {
   }
 }
 
-module.exports = {
-    // uploadFileToGCS,
-    getTrendingCampaigns,
-    loginToWeb,
-    addNewCampaign,
-    getMyCampaigns
-}
+// module.exports = {
+//     getTrendingCampaigns,
+//     loginToWeb,
+//     addNewCampaign,
+//     getMyCampaigns
+// }

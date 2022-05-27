@@ -1,7 +1,7 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const cors = require('cors');
-const Multer = require('multer');
+import express, { Express, Request, Response } from 'express';
+import bodyParser from 'body-parser';
+import cors from 'cors';
+import Multer from 'multer';
 
 const db_api = require('./sql-queries/q_mdapi');
 const db_webapi = require('./sql-queries/q_webapi');
@@ -10,10 +10,10 @@ const gcsMiddlewares = require('./middlewares/google-cloud-storage');
 const isAuthenticated = require('./middlewares/auth-middleware');
 
 // env
-const { PORT } = require('./env_config');
+import { PORT } from './env_config';
 
 // Initializing express
-const app = express();
+const app: Express = express();
 
 // Middlewares
 app.use(bodyParser.json());
@@ -41,15 +41,15 @@ const multer = Multer({
 });
 
 // Sample method
-app.get('/', (request, response) => {
+app.get('/', (request: Request, response: Response) => {
     response.status(200).json({ 
       status: 'success',
-      info: 'Welcome to EcoSense API! This API is built using Node.js, Express and Postgres API.' 
+      info: 'Welcome to EcoSense API! This API is built using Typescript, Node.js, Express and Postgres API.' 
     });
 });
 
 // favicon.ico
-app.get('/favicon.ico', (req, res) => res.status(204).end());
+app.get('/favicon.ico', (req: Request, res: Response) => res.status(204).end());
 
 // Endpoints based on API requirements
 app.get('/campaign', isAuthenticated, db_api.getCampaign);

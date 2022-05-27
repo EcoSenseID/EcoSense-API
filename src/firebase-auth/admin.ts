@@ -1,4 +1,4 @@
-const admin = require('firebase-admin');
+import * as admin from 'firebase-admin';
 const serviceAccount = require("../../keys/ecosense-bangkit-firebase-adminsdk-dsbjn-2e72d5ff27.json");
 
 admin.initializeApp({
@@ -6,4 +6,4 @@ admin.initializeApp({
     databaseURL: "https://ecosense-bangkit.firebaseio.com",
 });
 
-module.exports = admin;
+export default admin;

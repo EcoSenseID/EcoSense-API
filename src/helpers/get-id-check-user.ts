@@ -1,6 +1,6 @@
-const pool = require('../pool');
+import pool from '../pool';
 
-const getIdcheckAdminFromUid = async (uid) => {
+const getIdcheckUserFromUid = async (uid: String) => {
     // console.log('uid getID', uid);
     if (!uid) {
         return { error: true, message: "No uid!" }
@@ -18,18 +18,23 @@ const getIdcheckAdminFromUid = async (uid) => {
         } else {
             const queryString1 = ` SELECT id_role FROM user_role WHERE id_user = ${parseInt(id)}`;
             const results = await pool.query(queryString1); 
-            const isAdmin = results.rows[0].id_role === 1;
+            const isUser = results.rows[0].id_role === 2;
             // console.log('results', results.rows);
-            if (isAdmin) {
-                return {error: false, id: id, isAdmin: true };
+            if (isUser) {
+                return {error: false, id: id, isUser: true };
             } else {
-                return {error: false, id: id, isAdmin: false };
+                return {error: false, id: id, isUser: false };
             }
         }
     }
-    catch (error) {
-        return { error: true, message: error.message }
+    catch (error: any) {
+        let errorMessage = 'Failed to get id and check user role.'
+        if (error instanceof Error) {
+            errorMessage = error.message;
+        }
+        return { error: true, message: errorMessage }
     }
 }
 
-module.exports = getIdcheckAdminFromUid;
+// module.exports = getIdcheckUserFromUid;
+export default getIdcheckUserFromUid;

@@ -1,7 +1,8 @@
-const admin = require('../firebase-auth/admin');
+import admin from '../firebase-auth/admin';
+import { Request, Response, NextFunction } from 'express';
 
 // idToken comes from the client app
-const isAuthenticated = async (req, res, next) => {
+const isAuthenticated = async (req: Request, res: Response, next: NextFunction) => {
     const { authorization } = req.headers;
 
     if (!authorization)
@@ -29,7 +30,7 @@ const isAuthenticated = async (req, res, next) => {
         await admin.auth().verifyIdToken(idToken);
         next();
     }
-    catch (err) {
+    catch (err: any) {
         const errMessage = `${err.code} - ${err.message}`;
         return res.status(403).send({ 
             error: true,

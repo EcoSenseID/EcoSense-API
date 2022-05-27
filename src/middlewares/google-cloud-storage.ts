@@ -1,16 +1,9 @@
-const { storage, getPublicUrl } = require('../helpers/google-cloud-storage');
+import { storage, getPublicUrl } from '../helpers/google-cloud-storage';
+import { Request, Response, NextFunction } from 'express';
 
 const DEFAULT_BUCKET_NAME = 'ecosense-campaign-posters'; // Replace with the name of your bucket
 
-/**
- * Middleware for uploading file to GCS.
- * @param {Object} req
- * @param {Object} res
- * @param {Function} next
- * @return {*}
- */
-
-exports.sendUploadToGCS = (req, res, next) => {
+exports.sendUploadToGCS = (req: Request, res: Object, next: Function) => {
     if (!req.file) {
         return next();
     }
@@ -27,15 +20,17 @@ exports.sendUploadToGCS = (req, res, next) => {
     });
   
     stream.on('error', (err) => {
-        req.file.cloudStorageError = err;
+        // req.file.cloudStorageError = err;
         next(err);
     });
   
     stream.on('finish', () => {
-        req.file.cloudStorageObject = gcsFileName;
+        // req.file.cloudStorageObject = gcsFileName;
     
+        let gcsUrl = '';
         return file.makePublic().then(() => {
-            req.file.gcsUrl = getPublicUrl(bucketName, gcsFileName);
+            // req.file.gcsUrl = getPublicUrl(bucketName, gcsFileName);
+            gcsUrl = getPublicUrl(bucketName, gcsFileName);
             next();
         });
     });
