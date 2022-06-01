@@ -4,6 +4,7 @@ import getIdCheckUserFromUid from '../helpers/check-user';
 import { sendUploadToGCSFunc } from '../helpers/google-cloud-storage';
 import { Request, Response } from 'express';
 import getIdFromIdToken from '../helpers/get-id';
+import { convertToUnixTimestamp } from '../helpers/helpers';
 
 // TODO: DONE!
 export const getCampaign = async (request: Request, response: Response) => {
@@ -43,8 +44,8 @@ export const getCampaign = async (request: Request, response: Response) => {
                     posterUrl: data.poster_url,
                     title: data.title,
                     description: data.description,
-                    startDate: data.start_date,
-                    endDate: data.end_date,
+                    startDate: convertToUnixTimestamp(data.start_date),
+                    endDate: convertToUnixTimestamp(data.end_date),
                     category: (data.category || []).map((data: number) => (
                         categoriesList.filter((category: { id: number; }) => category.id === data)[0].name
                     )),
@@ -92,7 +93,7 @@ export const getDashboard = async (request: Request, response: Response) => {
                 id: data.id,
                 posterUrl: data.poster_url,
                 title: data.title,
-                endDate: data.end_date,
+                endDate: convertToUnixTimestamp(data.end_date),
                 category: (data.category || []).map((data: number) => (
                     categoriesList.filter((category: { id: number; }) => category.id === data)[0].name
                 )),
@@ -139,7 +140,7 @@ export const getDashboard = async (request: Request, response: Response) => {
                             return true;
                         })[0].name,
                         campaignName: campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0].title,
-                        campaignEndDate: campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0].endDate,
+                        campaignEndDate: convertToUnixTimestamp(campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0].endDate),
                         tasksLeft: taskList.filter((task: { id_campaign: number; }) => task.id_campaign == data.id_campaign).filter((task: { id: number; }) => {
                             if (completedTaskList.includes(task.id)) return false;
                             return true;
@@ -152,7 +153,7 @@ export const getDashboard = async (request: Request, response: Response) => {
                         id: data.id_campaign,
                         posterUrl: campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0].posterUrl,
                         title: campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0].title,
-                        endDate: campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0].endDate,
+                        endDate: convertToUnixTimestamp(campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0].endDate),
                         category: campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0].category,
                         participantsCount: campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0].participantsCount,
                         isTrending: campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0].isTrending,
@@ -245,8 +246,8 @@ export const getCampaignDetail = async (request: Request, response: Response) =>
                     isTrending: !data.participant_count ? false : data.participant_count > 1000 ? true : false,
                     isNew: Math.round((new Date().getTime() - data.start_date.getTime())/(1000*60*60*24)) <= 7,
                     initiator: data.initiator,
-                    startDate: data.start_date,
-                    endDate: data.end_date,
+                    startDate: convertToUnixTimestamp(data.start_date),
+                    endDate: convertToUnixTimestamp(data.end_date),
                     description: data.description,
                     joined: joinedList.includes(campaignId),
                     tasks: data.tasks
@@ -334,7 +335,7 @@ export const getContributions = async (request: Request, response: Response) => 
                         id: data.id_campaign,
                         posterUrl: campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0].posterUrl,
                         title: campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0].title,
-                        endDate: campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0].endDate,
+                        endDate: convertToUnixTimestamp(campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0].endDate),
                         category: campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0].category,
                         participantsCount: campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0].participantsCount,
                         isTrending: campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0].isTrending,
@@ -472,14 +473,9 @@ export const joinCampaign = async (request: Request, response: Response) => {
         `;
         pool.query(queryString, (error: Error, results: any) => {
             if (results[1].rows.length !== 0) {
-                response.status(200).json({
-                    error: false, message: "Success"
-                });
+                response.status(200).json({ error: false, message: "Success" });
             } else {
-                response.status(400).json({
-                    error: true,
-                    message: "Insert to DB not successful"
-                });
+                response.status(400).json({ error: true, message: "Insert to DB not successful" });
             }
         })
     }
