@@ -7,7 +7,7 @@ import * as db_api from './sql-queries/q_mdapi';
 import * as db_webapi from './sql-queries/q_webapi';
 
 // import * as gcsMiddlewares from './middlewares/google-cloud-storage';
-import isAuthenticated from './middlewares/auth-middleware';
+import {isAuthenticatedMobile, isAuthenticatedWeb} from './middlewares/auth-middleware';
 
 // env
 import { PORT } from './env_config';
@@ -52,22 +52,21 @@ app.get('/', (request: Request, response: Response) => {
 app.get('/favicon.ico', (req: Request, res: Response) => res.status(204).end());
 
 // Endpoints based on API requirements
-app.get('/campaign', isAuthenticated, db_api.getCampaign);
-app.get('/dashboard', isAuthenticated, db_api.getDashboard);
-app.get('/categories', isAuthenticated, db_api.getAllCategories);
-app.get('/detail', isAuthenticated, db_api.getCampaignDetail);
-app.get('/contributions', isAuthenticated, db_api.getContributions);
-app.post('/proof', isAuthenticated, multer.single('photo'), db_api.postProof);
-app.post('/completecampaign', isAuthenticated, db_api.postCompleteCampaign);
-app.post('/joincampaign', isAuthenticated, db_api.joinCampaign);
-app.post('/loginToMobile', isAuthenticated, db_api.loginToMobile);
+app.get('/campaign', isAuthenticatedMobile, db_api.getCampaign);
+app.get('/dashboard', isAuthenticatedMobile, db_api.getDashboard);
+app.get('/categories', isAuthenticatedMobile, db_api.getAllCategories);
+app.get('/detail', isAuthenticatedMobile, db_api.getCampaignDetail);
+app.get('/contributions', isAuthenticatedMobile, db_api.getContributions);
+app.post('/proof', isAuthenticatedMobile, multer.single('photo'), db_api.postProof);
+app.post('/completecampaign', isAuthenticatedMobile, db_api.postCompleteCampaign);
+app.post('/joincampaign', isAuthenticatedMobile, db_api.joinCampaign);
 
 // Endpoints for Ecosense Web
 // app.post('/uploadgcs', isAuthenticated, multer.single('image'), gcsMiddlewares.sendUploadToGCS, db_webapi.uploadFileToGCS);
 app.get('/trendingCampaigns', db_webapi.getTrendingCampaigns);
-app.post('/loginToWeb', isAuthenticated, db_webapi.loginToWeb);
-app.post('/addNewCampaign', isAuthenticated, multer.single('uploadPoster'), db_webapi.addNewCampaign);
-app.get('/myCampaigns', isAuthenticated, db_webapi.getMyCampaigns);
+app.post('/loginToWeb', isAuthenticatedWeb, db_webapi.loginToWeb);
+app.post('/addNewCampaign', isAuthenticatedWeb, multer.single('uploadPoster'), db_webapi.addNewCampaign);
+app.get('/myCampaigns', isAuthenticatedWeb, db_webapi.getMyCampaigns);
 
 // Server listening for requests
 app.listen(PORT, () => {

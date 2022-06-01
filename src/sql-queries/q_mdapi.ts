@@ -1,8 +1,9 @@
 import pool from '../pool';
 import getUid from '../firebase-auth/getUid';
-import getIdCheckUserFromUid from '../helpers/get-id-check-user';
+import getIdCheckUserFromUid from '../helpers/check-user';
 import { sendUploadToGCSFunc } from '../helpers/google-cloud-storage';
 import { Request, Response } from 'express';
+import getIdFromIdToken from '../helpers/get-id';
 
 // TODO: DONE!
 export const getCampaign = async (request: Request, response: Response) => {
@@ -68,11 +69,7 @@ export const getDashboard = async (request: Request, response: Response) => {
     const { authorization } = request.headers;
 
     try {
-        const uid = await getUid(authorization!);
-        const checkResult = await getIdCheckUserFromUid(uid);
-        const isUser = checkResult.isUser;
-        // const id = checkResult.id;
-        const id = 1;
+        const { id } = await getIdFromIdToken(authorization!);
 
         const queryString = `
             SELECT * FROM categories ORDER BY id;
@@ -205,11 +202,7 @@ export const getCampaignDetail = async (request: Request, response: Response) =>
         return;
     }
     try {
-        const uid = await getUid(authorization!);
-        const checkResult = await getIdCheckUserFromUid(uid);
-        const isUser = checkResult.isUser;
-        // const id = checkResult.id;
-        const id = 1;
+        const { id } = await getIdFromIdToken(authorization!);
 
         const queryString = `
             SELECT * FROM campaigns
@@ -273,11 +266,7 @@ export const getContributions = async (request: Request, response: Response) => 
     const { authorization } = request.headers;
 
     try {
-        const uid = await getUid(authorization!);
-        const checkResult = await getIdCheckUserFromUid(uid);
-        const isUser = checkResult.isUser;
-        // const id = checkResult.id;
-        const id = 1;
+        const { id } = await getIdFromIdToken(authorization!);
 
         const queryString = `
             SELECT * FROM categories ORDER BY id;
@@ -370,11 +359,7 @@ export const postProof = async (request: Request, response: Response) => {
     const photo = request.file;
 
     try {
-        const uid = await getUid(authorization!);
-        const checkResult = await getIdCheckUserFromUid(uid);
-        const isUser = checkResult.isUser;
-        // const id = checkResult.id;
-        const id = 2;
+        const { id } = await getIdFromIdToken(authorization!);
 
         if (!taskId) {
             response.status(400).json({ error: true, message: "No task ID given" });
@@ -441,11 +426,7 @@ export const postCompleteCampaign = async (request: Request, response: Response)
     const { authorization } = request.headers;
 
     try {
-        const uid = await getUid(authorization!);
-        const checkResult = await getIdCheckUserFromUid(uid);
-        const isUser = checkResult.isUser;
-        // const id = checkResult.id;
-        const id = 2;
+        const { id } = await getIdFromIdToken(authorization!);
 
         const currentDate = new Date().toISOString(); 
         const queryString = `
@@ -481,11 +462,7 @@ export const joinCampaign = async (request: Request, response: Response) => {
     const { authorization } = request.headers;
 
     try {
-        const uid = await getUid(authorization!);
-        const checkResult = await getIdCheckUserFromUid(uid);
-        const isUser = checkResult.isUser;
-        // const id = checkResult.id;
-        const id = 2;
+        const { id } = await getIdFromIdToken(authorization!);
 
         const currentDate = new Date().toISOString();
         const queryString = `
@@ -510,58 +487,6 @@ export const joinCampaign = async (request: Request, response: Response) => {
         response.status(err.code || 400).json({
             error: true, message: err.message
         });
-    }
-}
-
-// TODO:
-export const loginToMobile = async (request: Request, response: Response) => {
-    const { authorization } = request.headers;
-  
-    try {
-      const uid = await getUid(authorization!);
-  
-      // CHECK IF UID EXISTS IN TABLE
-      let hasExisted = false;
-      const queryString1 = `
-        SELECT id FROM users WHERE firebase_uid = '${uid}';
-      `;
-      const results1 = await pool.query(queryString1);
-      if (results1.rows.length === 0) {
-        hasExisted = false;
-      } else {
-        hasExisted = true;
-        response.status(200).json({
-          error: false,
-          message: "UID existed. Login success!"
-        });
-        return;
-      }
-  
-      if (!hasExisted) {
-        const queryString2 = `
-          INSERT INTO users (firebase_uid) VALUES ('${uid}') RETURNING id;
-          INSERT INTO user_role (id_user, id_role) SELECT id, 2 FROM users WHERE firebase_uid = '${uid}' RETURNING id_user;
-        `;
-        const results2: any = await pool.query(queryString2);
-        if (results2[0].rows[0].id === results2[1].rows[0].id_user){
-          response.status(200).json({
-            error: false,
-            message: "Add UID and login to Web success!"
-          });
-          return;
-        } else {
-          response.status(400).json({
-            error: false,
-            message: "Add UID failed but login to Web success!"
-          });
-          return;
-        }
-      }
-    }
-    catch(error: any) {
-      response.status(error.code || 400).json({
-        error: true, message: error.message
-      });
     }
 }
 

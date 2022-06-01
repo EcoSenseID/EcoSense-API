@@ -1,6 +1,6 @@
 import pool from '../pool';
 
-const getIdCheckAdminFromUid = async (uid: String) => {
+const checkAdminFromUid = async (uid: String) => {
     // console.log('uid getID', uid);
     if (!uid) {
         return { error: true, message: "No uid!" }
@@ -21,9 +21,9 @@ const getIdCheckAdminFromUid = async (uid: String) => {
             const isAdmin = results.rows[0].id_role === 1;
             // console.log('results', results.rows);
             if (isAdmin) {
-                return {error: false, id: id, isAdmin: true };
+                return {error: false, isAdmin: true };
             } else {
-                return {error: false, id: id, isAdmin: false };
+                return {error: false, isAdmin: false };
             }
         }
     }
@@ -36,5 +36,5 @@ const getIdCheckAdminFromUid = async (uid: String) => {
     }
 }
 
-// module.exports = getIdcheckAdminFromUid;
-export default getIdCheckAdminFromUid;
+// module.exports = checkAdminFromUid;
+export default checkAdminFromUid;
