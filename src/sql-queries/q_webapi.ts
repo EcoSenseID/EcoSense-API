@@ -178,14 +178,16 @@ export const getMyCampaigns = async (request: Request, response: Response) => {
       ON campaigns.id = a.id_campaign
       LEFT JOIN (SELECT id_campaign, COUNT(id_user) as participant_count FROM campaign_participant GROUP BY id_campaign) AS b
       ON campaigns.id = b.id_campaign
+      LEFT JOIN (SELECT id_campaign, array_agg(json_build_object('order_number', order_number, 'name', name, 'require_proof', require_proof)) as task FROM tasks GROUP BY id_campaign) AS c
+      ON campaigns.id = c.id_campaign
       WHERE initiator LIKE '${displayName}%'
       ORDER BY id;
     `;
     // console.log(queryString);
     const results: any = await pool.query(queryString);
     if (results) {
-      const categoriesList = results[0].rows.map((data: { id: number; name: string; }) => ({
-          id: data.id, name: data.name
+      const categoriesList = results[0].rows.map((data: { id: number; name: string; color_hex: string; }) => ({
+          id: data.id, name: data.name, color_hex: data.color_hex
       }))
       const campaignsList = results[1].rows;
       // console.log(categoriesList);
@@ -201,9 +203,10 @@ export const getMyCampaigns = async (request: Request, response: Response) => {
               description: data.description,
               startDate: data.start_date,
               endDate: data.end_date,
-              category: (data.category || []).map((data: number) => (
-                  categoriesList.filter((category: { id: number; }) => category.id === data)[0].name
+              categories: (data.category || []).map((data: number) => (
+                  categoriesList.filter((category: { id: number; }) => category.id === data)[0]
               )),
+              tasks: data.task,
               participantsCount: data.participant_count || 0,
               isTrending: !data.participant_count ? false : data.participant_count > 1000 ? true : false,
               isNew: Math.round((new Date().getTime() - data.start_date.getTime())/(1000*60*60*24)) <= 7
