@@ -64,8 +64,11 @@ app.post('/joincampaign', isAuthenticatedMobile, db_api.joinCampaign);
 // Endpoints for Ecosense Web
 // app.post('/uploadgcs', isAuthenticated, multer.single('image'), gcsMiddlewares.sendUploadToGCS, db_webapi.uploadFileToGCS);
 app.get('/trendingCampaigns', db_webapi.getTrendingCampaigns);
+app.get('/allCategories', isAuthenticatedWeb, db_webapi.getAllCategories);
 app.post('/loginToWeb', isAuthenticatedWeb, db_webapi.loginToWeb);
 app.post('/addNewCampaign', isAuthenticatedWeb, multer.single('uploadPoster'), db_webapi.addNewCampaign);
+app.put('/editCampaign', isAuthenticatedWeb, multer.single('uploadPoster'), db_webapi.editCampaign);
+app.delete('/deleteCampaign', isAuthenticatedWeb, db_webapi.deleteCampaign);
 app.get('/myCampaigns', isAuthenticatedWeb, db_webapi.getMyCampaigns);
 
 // Server listening for requests

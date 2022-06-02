@@ -30,6 +30,8 @@ This is the back-end for EcoSense capstone project, which is included in the Ban
 - [x] `GET` `/trendingCampaigns`
 - [x] `POST` `/loginToWeb` &#8594; call only when login with Google or sign up with Email & Password
 - [x] `POST` `/addNewCampaign`
+- [x] `PUT` `/editCampaign`
+- [x] `DEL` `/deleteCampaign?campaignId={<int>}`
 - [x] `GET` `/myCampaigns`
 
 ## Try the API

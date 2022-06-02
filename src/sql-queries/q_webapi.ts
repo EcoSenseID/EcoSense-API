@@ -164,6 +164,126 @@ export const addNewCampaign = async (request: Request, response: Response) => {
   }
 }
 
+export const editCampaign = async (request: Request, response: Response) => {
+  const { authorization } = request.headers;
+  const newCampaignData = JSON.parse(request.body.newCampaignData);
+  const posterChanged = JSON.parse(request.body.posterChanged);
+  const posterFile = request.file;
+  // console.log('posterChanged', posterChanged);
+  // console.log('posterFile', posterFile);
+
+  try {
+    const { id: userId } = await getIdFromIdToken(authorization!);
+    const {
+      id,
+      title,
+      description,
+      categories,
+      tasks,
+      startDate,
+      endDate,
+      posterUrl
+    } = newCampaignData;
+
+    let posterGCSURL = posterUrl;
+    if (posterChanged === true) {
+      if (!posterFile) {
+        response.status(400).json({
+          error: true, message: 'Poster not detected!'
+        });
+      } else {
+        const result = await sendUploadToGCSFunc(posterFile, 'ecosense-campaign-posters');
+        if (result.error) {
+          throw result.error
+        } else {
+          posterGCSURL = result.gcsUrl
+        }
+      }
+    }
+
+    const queryString = `UPDATE campaigns 
+      SET title = '${title}', description = '${description}', start_date = '${startDate}', end_date = '${endDate}', poster_url = '${posterGCSURL}'
+      WHERE id = ${id}
+      RETURNING id;
+      DELETE FROM category_campaign WHERE id_campaign = ${id};
+      ${categories.map((data: { id: number; earned_experience_point: number; }) => 
+        (`INSERT INTO category_campaign (id_category, id_campaign, earned_experience_point) VALUES (${data.id}, ${id}, ${data.earned_experience_point});`)
+      ).join(' ')}
+      DELETE FROM tasks WHERE id_campaign = ${id};
+      ${tasks.map((data: { order_number: number; name: string; require_proof: boolean; }) => 
+        (`INSERT INTO tasks (id_campaign, order_number, name, require_proof) VALUES (${id}, ${data.order_number}, '${data.name}', ${data.require_proof});`)
+      ).join(' ')}
+    `;
+    // console.log(queryString);
+    const results: any = await pool.query(queryString);
+    if (results[0].rows[0].id){
+      response.status(200).json({
+        error: false, 
+        message: 'Edit campaign success!'
+      });
+      return;
+    } else {
+      response.status(403).json({
+        error: true, message: 'Input to DB failed!'
+      });
+      return;
+    }
+  }
+  catch (error: any) {
+    response.status(error.code || 400).json({
+      error: true, message: error.message
+    }); return;
+  }
+}
+
+export const deleteCampaign = async (request: Request, response: Response) => {
+  const { authorization } = request.headers;
+  const { campaignId: id } = request.query; 
+
+  try {
+    const queryString = `DELETE from campaigns WHERE id=${id}; DELETE FROM category_campaign WHERE id_campaign = ${id}; DELETE FROM tasks WHERE id_campaign = ${id};`;
+    const results: any = await pool.query(queryString);
+    if (results[0].rows[0].id){
+      response.status(200).json({
+        error: false, 
+        message: 'Delete campaign success!'
+      });
+      return;
+    } else {
+      response.status(403).json({
+        error: true, message: 'Delete campaign from DB failed!'
+      });
+      return;
+    }
+  }
+  catch (error: any) {
+    response.status(error.code || 400).json({
+      error: true, message: error.message
+    }); return;
+  }
+}
+
+export const getAllCategories = (request: Request, response: Response) => {
+  try {
+      const queryString = `SELECT * FROM categories ORDER BY id;`;
+      pool.query(queryString, (error: Error, results: any) => {
+          response.status(200).json({
+              error: false,
+              message: "Categories fetched successfully",
+              categories: results.rows.map((data: { id: number; photo_url: string; name: string; color_hex: string; }) => ({
+                  id: data.id, photoUrl: data.photo_url, name: data.name, colorHex: data.color_hex
+              }))
+          });
+          if (error) throw error;
+      });
+  }
+  catch(error: any) {
+      response.status(error.code || 400).json({
+          error: true, message: error.message
+      });
+  }
+}
+
 export const getMyCampaigns = async (request: Request, response: Response) => {
   const { authorization } = request.headers;
   const { displayName } = request.query;
@@ -174,7 +294,7 @@ export const getMyCampaigns = async (request: Request, response: Response) => {
     const queryString = `
       SELECT * FROM categories ORDER BY id;
       SELECT * FROM campaigns
-      LEFT JOIN (SELECT id_campaign, array_agg(id_category) as category FROM category_campaign GROUP BY id_campaign) AS a
+      LEFT JOIN (SELECT id_campaign, array_agg(json_build_object('id_category', id_category, 'earned_experience_point', earned_experience_point)) as category FROM category_campaign GROUP BY id_campaign) AS a
       ON campaigns.id = a.id_campaign
       LEFT JOIN (SELECT id_campaign, COUNT(id_user) as participant_count FROM campaign_participant GROUP BY id_campaign) AS b
       ON campaigns.id = b.id_campaign
@@ -203,9 +323,10 @@ export const getMyCampaigns = async (request: Request, response: Response) => {
               description: data.description,
               startDate: data.start_date,
               endDate: data.end_date,
-              categories: (data.category || []).map((data: number) => (
-                  categoriesList.filter((category: { id: number; }) => category.id === data)[0]
-              )),
+              categories: (data.category || []).map((data: { id_category: number; earned_experience_point: number}) => ({
+                  ...categoriesList.filter((category: { id: number; }) => category.id === data.id_category)[0],
+                  earned_experience_point: data.earned_experience_point
+            })),
               tasks: data.task,
               participantsCount: data.participant_count || 0,
               isTrending: !data.participant_count ? false : data.participant_count > 1000 ? true : false,
