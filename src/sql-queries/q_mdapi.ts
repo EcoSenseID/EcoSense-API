@@ -245,7 +245,7 @@ export const getCampaignDetail = async (request: Request, response: Response) =>
                     posterUrl: data.poster_url,
                     isTrending: !data.participant_count ? false : data.participant_count > 1000 ? true : false,
                     isNew: Math.round((new Date().getTime() - data.start_date.getTime())/(1000*60*60*24)) <= 7,
-                    initiator: data.initiator,
+                    initiator: data.id_initiator,
                     startDate: convertToUnixTimestamp(data.start_date),
                     endDate: convertToUnixTimestamp(data.end_date),
                     description: data.description,

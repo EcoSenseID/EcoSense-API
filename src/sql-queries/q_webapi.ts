@@ -132,8 +132,8 @@ export const addNewCampaign = async (request: Request, response: Response) => {
       }
     }
 
-    const queryString = `INSERT INTO campaigns (title, initiator, description, start_date, end_date, poster_url)
-      VALUES ('${campaignTitle}', '${campaignInitiator}', '${campaignDescription}', '${campaignStartDate}', '${campaignEndDate}', '${posterGCSURL}')
+    const queryString = `INSERT INTO campaigns (title, id_initiator, description, start_date, end_date, poster_url)
+      VALUES ('${campaignTitle}', '${id}', '${campaignDescription}', '${campaignStartDate}', '${campaignEndDate}', '${posterGCSURL}')
       RETURNING id;
       ${campaignCategories.map((data: { id: number; earned_experience_point: number; }) => 
         (`INSERT INTO category_campaign (id_category, id_campaign, earned_experience_point) SELECT ${data.id}, id, ${data.earned_experience_point} FROM campaigns WHERE poster_url = '${posterGCSURL}';`)
@@ -286,7 +286,7 @@ export const getAllCategories = (request: Request, response: Response) => {
 
 export const getMyCampaigns = async (request: Request, response: Response) => {
   const { authorization } = request.headers;
-  const { displayName } = request.query;
+  // const { displayName } = request.query;
 
   try {
     const { id } = await getIdFromIdToken(authorization!);
@@ -300,7 +300,7 @@ export const getMyCampaigns = async (request: Request, response: Response) => {
       ON campaigns.id = b.id_campaign
       LEFT JOIN (SELECT id_campaign, array_agg(json_build_object('order_number', order_number, 'name', name, 'require_proof', require_proof)) as task FROM tasks GROUP BY id_campaign) AS c
       ON campaigns.id = c.id_campaign
-      WHERE initiator LIKE '${displayName}%'
+      WHERE id_initiator = ${id}
       ORDER BY id;
     `;
     // console.log(queryString);
