@@ -43,7 +43,7 @@ To get the most trending campaigns, you can try to access [this link](https://ec
 - Cloud Build Trigger `ecosense-restapi`
 - Google App Engine 
   - Service `default`
-  - Latest Version `20220601t074215` (June 01, 2022)
+  - Latest Version `20220604t163517` (June 05, 2022)
 - Google Cloud Storage 
   - Bucket for Campaign Posters `ecosense-campaign-posters`
   - Bucket for Task Completion Proof `ecosense-task-proofs`
