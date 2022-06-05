@@ -140,7 +140,7 @@ export const getDashboard = async (request: Request, response: Response) => {
                             return true;
                         })[0].name,
                         campaignName: campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0].title,
-                        campaignEndDate: convertToUnixTimestamp(campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0].endDate),
+                        campaignEndDate: campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0].endDate,
                         tasksLeft: taskList.filter((task: { id_campaign: number; }) => task.id_campaign == data.id_campaign).filter((task: { id: number; }) => {
                             if (completedTaskList.includes(task.id)) return false;
                             return true;
@@ -153,7 +153,7 @@ export const getDashboard = async (request: Request, response: Response) => {
                         id: data.id_campaign,
                         posterUrl: campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0].posterUrl,
                         title: campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0].title,
-                        endDate: convertToUnixTimestamp(campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0].endDate),
+                        endDate: campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0].endDate,
                         category: campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0].category,
                         participantsCount: campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0].participantsCount,
                         isTrending: campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0].isTrending,
