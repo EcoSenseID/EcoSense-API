@@ -327,8 +327,8 @@ export const getMyCampaigns = async (request: Request, response: Response) => {
                   earned_experience_point: data.earned_experience_point
             })),
               tasks: data.task,
-              participantsCount: data.participant_count || 0,
-              isTrending: !data.participant_count ? false : data.participant_count > 1000 ? true : false,
+              participantsCount: parseInt(data.participant_count) || 0,
+              isTrending: !data.participant_count ? false : parseInt(data.participant_count) > 1000 ? true : false,
               isNew: Math.round((new Date().getTime() - data.start_date.getTime())/(1000*60*60*24)) <= 7
           }))
       });
