@@ -70,6 +70,7 @@ app.post('/addNewCampaign', isAuthenticatedWeb, multer.single('uploadPoster'), d
 app.put('/editCampaign', isAuthenticatedWeb, multer.single('uploadPoster'), db_webapi.editCampaign);
 app.delete('/deleteCampaign', isAuthenticatedWeb, db_webapi.deleteCampaign);
 app.get('/myCampaigns', isAuthenticatedWeb, db_webapi.getMyCampaigns);
+app.get('/campaignParticipants', isAuthenticatedWeb, db_webapi.getCampaignParticipant);
 
 // Server listening for requests
 app.listen(PORT, () => {

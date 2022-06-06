@@ -1,19 +1,13 @@
 import { Storage } from '@google-cloud/storage';
 import path from 'path';
-  
-const GOOGLE_CLOUD_PROJECT_ID = 'ecosense-bangkit'; // Replace with your project ID
-const GOOGLE_CLOUD_KEYFILE = __dirname + './../../keys/ecosense-bangkit-2ef1106a1a89.json'; // Replace with the path to the downloaded private key
-
-export const storage = new Storage({
-    projectId: GOOGLE_CLOUD_PROJECT_ID,
-    keyFilename: GOOGLE_CLOUD_KEYFILE,
-});
+import { storageInit } from './secret-manager';
 
 export const getPublicUrl = (bucketName: string, fileName: string): string => `https://storage.googleapis.com/${bucketName}/${fileName}`;
 
-exports.copyFileToGCS = (localFilePath: string, bucketName: string, options: Object) => {
+exports.copyFileToGCS = async (localFilePath: string, bucketName: string, options: Object) => {
     options = options || {};
   
+    const storage: Storage = await storageInit();
     const bucket = storage.bucket(bucketName);
     const fileName = path.basename(localFilePath);
     const gcsName = `${Date.now()}-${fileName}`;
@@ -30,6 +24,7 @@ export const sendUploadToGCSFunc = async (reqFile: Express.Multer.File, bucketNa
         throw new Error('File or bucket name not found');
     }
 
+    const storage: Storage = await storageInit();
     const bucket = storage.bucket(bucketName);
     const gcsFileName = `${Date.now()}-${reqFile.originalname}`;
     const file = bucket.file(gcsFileName);

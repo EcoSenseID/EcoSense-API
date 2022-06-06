@@ -468,7 +468,7 @@ export const joinCampaign = async (request: Request, response: Response) => {
         const currentDate = new Date().toISOString();
         const queryString = `
             INSERT INTO campaign_participant (id_campaign, id_user, is_completed, joined_timestamp, completed_timestamp)
-            VALUES (${campaignId}, ${id}, false, '${currentDate}', '');
+            VALUES (${campaignId}, ${id}, false, '${currentDate}', '${currentDate}');
             SELECT * FROM campaign_participant WHERE id_campaign = ${campaignId} AND id_user = ${id};
         `;
         pool.query(queryString, (error: Error, results: any) => {

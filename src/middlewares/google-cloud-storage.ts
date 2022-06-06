@@ -1,13 +1,16 @@
-import { storage, getPublicUrl } from '../helpers/google-cloud-storage';
+import { getPublicUrl } from '../helpers/google-cloud-storage';
 import { Request, Response, NextFunction } from 'express';
+import { storageInit } from '../helpers/secret-manager';
+import { Storage } from '@google-cloud/storage';
 
 const DEFAULT_BUCKET_NAME = 'ecosense-campaign-posters'; // Replace with the name of your bucket
 
-exports.sendUploadToGCS = (req: Request, res: Object, next: Function) => {
+exports.sendUploadToGCS = async (req: Request, res: Object, next: Function) => {
     if (!req.file) {
         return next();
     }
   
+    const storage: Storage = await storageInit();
     const bucketName = req.body.bucketName || DEFAULT_BUCKET_NAME;
     const bucket = storage.bucket(bucketName);
     const gcsFileName = `${Date.now()}-${req.file.originalname}`;

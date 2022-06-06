@@ -79,7 +79,7 @@ export const isAuthenticatedWeb = async (req: Request, res: Response, next: Next
         else {
             res.status(403).json({
                 error: true, message: 'Forbidden. Admin only!'
-              });
+            });
         }
     }
     catch (err: any) {

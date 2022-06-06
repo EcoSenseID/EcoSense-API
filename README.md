@@ -33,6 +33,7 @@ This is the back-end for EcoSense capstone project, which is included in the Ban
 - [x] `PUT` `/editCampaign`
 - [x] `DEL` `/deleteCampaign?campaignId={<int>}`
 - [x] `GET` `/myCampaigns`
+- [x] `GET` `/campaignParticipants?campaignId={<int>}`
 
 ## Try the API
 To get the most trending campaigns, you can try to access [this link](https://ecosense-bangkit.uc.r.appspot.com/trendingCampaigns).

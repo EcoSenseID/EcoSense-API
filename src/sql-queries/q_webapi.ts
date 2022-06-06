@@ -1,6 +1,5 @@
 import pool from '../pool';
 import getUid from '../firebase-auth/getUid';
-import getIdCheckAdminFromUid from '../helpers/check-admin';
 import { sendUploadToGCSFunc } from '../helpers/google-cloud-storage';
 
 import { Request, Response } from 'express';
@@ -343,6 +342,61 @@ export const getMyCampaigns = async (request: Request, response: Response) => {
     response.status(400).json({
       error: true, message: error.message
     }); 
+    return;
+  }
+}
+
+export const getCampaignParticipant = async (request: Request, response: Response) => {
+  const { authorization } = request.headers;
+  const { campaignId } = request.query;
+  // console.log(campaignId);
+
+  try {
+    const { id } = await getIdFromIdToken(authorization!);
+    // console.log(id);
+
+    const queryString = `
+      SELECT id_campaign, joined_timestamp, COUNT(id_user) AS user_count 
+      FROM campaign_participant 
+      WHERE id_campaign = ${campaignId} GROUP BY id_campaign, joined_timestamp ORDER BY joined_timestamp;
+    `;
+    // const currentDate = new Date(new Date().getTime() - 2*24*60*60*1000).toISOString();
+    // const queryString = `
+    //   INSERT INTO campaign_participant (id_campaign, id_user, is_completed, joined_timestamp, completed_timestamp)
+    //   VALUES (${campaignId}, 1, false, '${currentDate}', '${currentDate}');
+    //   SELECT * FROM campaign_participant WHERE id_campaign = ${campaignId} AND id_user = 1;
+    // `;
+    console.log(queryString);
+    const results: any = await pool.query(queryString);
+    // if (results[1].rows.length !== 0) {
+    //   response.status(200).json({ error: false, message: "Success" });
+    // } else {
+    //     response.status(400).json({ error: true, message: "Insert to DB not successful" });
+    // }
+    if (results) {
+      // console.log(results.rows);
+      response.status(200).json({
+        error: false,
+        message: 'Campaign Participants fetched successfully',
+        id_campaign: results.rows[0].id_campaign,
+        participants: [
+          ...results.rows.map((data: { joined_timestamp: Date; user_count: string; }) => {
+            let dateOnly = data.joined_timestamp.toISOString().split('T')[0];
+            return {
+              date: `${parseInt(dateOnly.split('-')[2])}/${parseInt(dateOnly.split('-')[1])}`,
+              registrationCount: parseInt(data.user_count)
+            }
+          })
+        ]
+      });
+    } else {
+      response.status(400).json({
+        error: true, message: 'Fetch from DB failed.'
+      }); return;
+    }
+  }
+  catch (error: any) {
+    response.status(400).json({ error: true, message: error.message }); 
     return;
   }
 }
