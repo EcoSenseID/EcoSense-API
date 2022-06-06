@@ -1,4 +1,9 @@
 # EcoSense App API
+[![issues](https://img.shields.io/github/issues/EcoSenseID/EcoSense-API)](https://github.com/EcoSenseID/EcoSense-API/issues)
+[![language](https://img.shields.io/github/languages/count/EcoSenseID/EcoSense-API)](https://github.com/EcoSenseID/EcoSense-API/search?l=typescript)
+[![top-language](https://img.shields.io/github/languages/top/EcoSenseID/EcoSense-API)](https://github.com/EcoSenseID/EcoSense-API/search?l=typescript)
+[![commit](https://img.shields.io/github/commit-activity/m/EcoSenseID/EcoSense-API)](https://github.com/EcoSenseID/EcoSense-API/commits/main)
+[![last-commit](https://img.shields.io/github/last-commit/EcoSenseID/EcoSense-API)](https://github.com/EcoSenseID/EcoSense-API/commits/main)
 
 ## Introduction
 A RESTful API built with ExpressJS and TypeScript for CRUD operation.\
@@ -12,6 +17,19 @@ This is the back-end for EcoSense capstone project, which is included in the Ban
 [![TypeScript](https://img.shields.io/badge/typescript-black?style=for-the-badge&logo=typescript&logoColor=%23007ACC)](https://github.com/EcoSenseID?tab=repositories&language=typescript)
 [![Postgres](https://img.shields.io/badge/postgres-black.svg?style=for-the-badge&logo=postgresql&logoColor=%23316192)](https://github.com/EcoSenseID?tab=repositories)
 [![Google Cloud](https://img.shields.io/badge/GoogleCloud-black.svg?style=for-the-badge&logo=google-cloud&logoColor=%234285F4)](https://github.com/EcoSenseID?tab=repositories)
+
+## Dependencies
+[![@google-cloud/secret-manager](https://img.shields.io/github/package-json/dependency-version/EcoSenseID/EcoSense-API/@google-cloud/secret-manager)](https://www.npmjs.com/package/@google-cloud/secret-manager)
+[![@google-cloud/storage](https://img.shields.io/github/package-json/dependency-version/EcoSenseID/EcoSense-API/@google-cloud/storage)](https://www.npmjs.com/package/@google-cloud/storage)
+[![cors](https://img.shields.io/github/package-json/dependency-version/EcoSenseID/EcoSense-API/cors)](https://www.npmjs.com/package/cors)
+[![dotenv](https://img.shields.io/github/package-json/dependency-version/EcoSenseID/EcoSense-API/dotenv)](https://www.npmjs.com/package/dotenv)
+[![express](https://img.shields.io/github/package-json/dependency-version/EcoSenseID/EcoSense-API/express)](https://www.npmjs.com/package/express)
+[![firebase-admin](https://img.shields.io/github/package-json/dependency-version/EcoSenseID/EcoSense-API/firebase-admin)](https://www.npmjs.com/package/firebase-admin)
+[![multer](https://img.shields.io/github/package-json/dependency-version/EcoSenseID/EcoSense-API/multer)](https://www.npmjs.com/package/multer)
+[![pg](https://img.shields.io/github/package-json/dependency-version/EcoSenseID/EcoSense-API/pg)](https://www.npmjs.com/package/pg)
+[![typescript](https://img.shields.io/github/package-json/dependency-version/EcoSenseID/EcoSense-API/dev/typescript)](https://www.npmjs.com/package/typescript)
+
+[Go to List of Dependencies](https://github.com/EcoSenseID/EcoSense-API/network/dependencies)
 
 ## Endpoints for Android
 - [x] `GET` `/campaigns`
@@ -42,11 +60,11 @@ To get the most trending campaigns, you can try to access [this link](https://ec
 
 ## Google Cloud Platform Infrastructure
 - Cloud Source Repositories `ecosense-restapi:main`
-- Cloud Build
+- Cloud Build (Latest: `8525f2e2`)
 - Cloud Build Trigger `ecosense-restapi`
 - Google App Engine 
   - Service `default`
-  - Latest Version `20220606t094053` (June 06, 2022)
+  - Latest Version `20220606t104645` (June 06, 2022)
 - Google Cloud Storage 
   - Bucket for Campaign Posters `ecosense-campaign-posters`
   - Bucket for Task Completion Proof `ecosense-task-proofs`
