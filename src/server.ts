@@ -60,6 +60,8 @@ app.get('/contributions', isAuthenticatedMobile, db_api.getContributions);
 app.post('/proof', isAuthenticatedMobile, multer.single('photo'), db_api.postProof);
 app.post('/completecampaign', isAuthenticatedMobile, db_api.postCompleteCampaign);
 app.post('/joincampaign', isAuthenticatedMobile, db_api.joinCampaign);
+app.get('/savedrecognisables', isAuthenticatedMobile, db_api.getRecognisables);
+app.post('/saverecognisable', isAuthenticatedMobile, db_api.postRecognisables);
 
 // Endpoints for Ecosense Web
 // app.post('/uploadgcs', isAuthenticated, multer.single('image'), gcsMiddlewares.sendUploadToGCS, db_webapi.uploadFileToGCS);

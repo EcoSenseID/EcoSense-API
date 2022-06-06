@@ -18,8 +18,7 @@ const getIdCheckUserFromUid = async (uid: String) => {
         } else {
             const queryString1 = ` SELECT id_role FROM user_role WHERE id_user = ${id}`;
             const results = await pool.query(queryString1); 
-            const isUser = results.rows[0].id_role === 2;
-            // console.log('results', results.rows);
+            const isUser = results.rows.filter((data: { id_role: number; }) => data.id_role === 2).length > 0;
             if (isUser) {
                 return {error: false, id: id, isUser: true };
             } else {

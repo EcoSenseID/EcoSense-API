@@ -1,6 +1,6 @@
 import pool from '../pool.js';
 import { sendUploadToGCSFunc } from '../helpers/google-cloud-storage.js';
-import { Request, Response } from 'express';
+import { query, Request, Response } from 'express';
 import getIdFromIdToken from '../helpers/get-id.js';
 import { convertToUnixTimestamp } from '../helpers/helpers.js';
 
@@ -484,13 +484,69 @@ export const joinCampaign = async (request: Request, response: Response) => {
     }
 }
 
-// module.exports = {
-//     getCampaign,
-//     getDashboard,
-//     getAllCategories,
-//     getCampaignDetail,
-//     getContributions,
-//     postProof,
-//     postCompleteCampaign,
-//     joinCampaign
-// }
+// TO DO: DONE and TESTED!
+export const getRecognisables = async (request: Request, response: Response) => {
+    const { authorization } = request.headers;
+
+    try {
+        const { id } = await getIdFromIdToken(authorization!);
+
+        const queryString = `SELECT * FROM histories WHERE id_user = ${id} ORDER BY timestamp;`;
+        const results: any = await pool.query(queryString);
+
+        if (results) {
+            response.status(200).json({ 
+                error: false, 
+                message: "Saved recognisables fetched successfully",
+                recognisables: [
+                    ...results.rows.map((data: { id: number; timestamp: string | Date; label: string; confidence_percent: number; }) => {
+                        return {
+                            id: data.id,
+                            savedAt: convertToUnixTimestamp(data.timestamp),
+                            label: data.label,
+                            confidencePercent: data.confidence_percent
+                        }
+                    })
+                ]
+            });
+        } else {
+            response.status(400).json({ error: true, message: "Get Recognisables not successful" });
+        }
+    }
+    catch (err: any) {
+        response.status(err.code || 400).json({
+            error: true, message: err.message
+        });
+    }
+}
+
+// TO DO: DONE and TESTED!
+export const postRecognisables = async (request:Request, response:Response) => {
+    const { authorization } = request.headers;
+    const reqBody = request.body;
+    const label:string = reqBody.label;
+    const confidencePercent:number = parseInt(reqBody.confidencePercent);
+
+    try {
+        const { id } = await getIdFromIdToken(authorization!);
+        const currentDate = new Date().toISOString();
+
+        const queryString = `
+            INSERT INTO histories (id_user, label, timestamp, confidence_percent)
+            VALUES (${id}, '${label}', '${currentDate}', ${confidencePercent}) RETURNING id;
+            SELECT id FROM histories WHERE id_user = ${id} AND timestamp = '${currentDate}';
+        `;
+        console.log(queryString);
+        const results: any = await pool.query(queryString);
+        if (results[0].rows[0].id === results[1].rows[0].id) {
+            response.status(200).json({ error: false, message: "Success", recognisableId: results[0].rows[0].id });
+        } else {
+            response.status(400).json({ error: true, message: "Save Recognisables not successful" });
+        }
+    }
+    catch (err: any) {
+        response.status(400).json({
+            error: true, message: err.message
+        });
+    }
+}

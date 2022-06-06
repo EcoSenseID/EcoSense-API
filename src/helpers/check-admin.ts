@@ -18,7 +18,7 @@ const checkAdminFromUid = async (uid: String) => {
         } else {
             const queryString1 = ` SELECT id_role FROM user_role WHERE id_user = ${id}`;
             const results = await pool.query(queryString1); 
-            const isAdmin = results.rows[0].id_role === 1;
+            const isAdmin = results.rows.filter((data: { id_role: number; }) => data.id_role === 1).length > 0;
             // console.log('results', results.rows);
             if (isAdmin) {
                 return {error: false, isAdmin: true };

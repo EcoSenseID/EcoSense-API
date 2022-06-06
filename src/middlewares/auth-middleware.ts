@@ -27,7 +27,7 @@ export const isAuthenticatedMobile = async (req: Request, res: Response, next: N
         
         // CHECK IF UID EXISTS IN TABLE
         let hasExisted = false;
-        const queryString1 = ` SELECT id FROM users WHERE firebase_uid = '${uid}'; `;
+        const queryString1 = `SELECT id FROM users WHERE firebase_uid = '${uid}'`;
         const results1 = await pool.query(queryString1);
         if (results1.rows.length === 0) {
             hasExisted = false;
