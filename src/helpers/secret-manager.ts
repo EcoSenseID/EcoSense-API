@@ -7,7 +7,7 @@ let credentials: admin.app.App;
 
 export const firebaseInit = async (): Promise<admin.app.App> => {
     const [version] = await client.accessSecretVersion({
-        name: 'projects/700975405784/secrets/ecosense-bangkit-firebase-adminsdk/versions/1', // enter the copied resource id here
+        name: 'projects/700975405784/secrets/ecosense-bangkit-firebase-adminsdk/versions/2', // enter the copied resource id here
     });
     const result: any = await JSON.parse(version.payload!.data!.toString());
     // console.log(result);
@@ -33,7 +33,7 @@ export const firebaseInit = async (): Promise<admin.app.App> => {
 
 export const storageInit = async (): Promise<Storage> => {
     const [version] = await client.accessSecretVersion({
-        name: 'projects/700975405784/secrets/ecosense-bangkit-gcs/versions/1'
+        name: 'projects/700975405784/secrets/ecosense-bangkit-gcs/versions/2'
     });
     // console.log(version.payload!.data);
     const result: any = await JSON.parse(version.payload!.data!.toString());
