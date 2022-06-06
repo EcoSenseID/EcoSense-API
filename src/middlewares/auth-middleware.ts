@@ -1,9 +1,9 @@
-import admin from '../firebase-auth/admin';
+import admin from '../firebase-auth/admin.js';
 import { Request, Response, NextFunction } from 'express';
-import checkUserFromUid from '../helpers/check-user';
-import getUid from '../firebase-auth/getUid';
-import pool from '../pool';
-import checkAdminFromUid from '../helpers/check-admin';
+import checkUserFromUid from '../helpers/check-user.js';
+import getUid from '../firebase-auth/getUid.js';
+import pool from '../pool.js';
+import checkAdminFromUid from '../helpers/check-admin.js';
 
 // idToken comes from the client app
 export const isAuthenticatedMobile = async (req: Request, res: Response, next: NextFunction) => {

@@ -1,10 +1,10 @@
 import { Storage } from '@google-cloud/storage';
 import path from 'path';
-import { storageInit } from './secret-manager';
+import { storageInit } from './secret-manager.js';
 
 export const getPublicUrl = (bucketName: string, fileName: string): string => `https://storage.googleapis.com/${bucketName}/${fileName}`;
 
-exports.copyFileToGCS = async (localFilePath: string, bucketName: string, options: Object) => {
+export const copyFileToGCS = async (localFilePath: string, bucketName: string, options: Object) => {
     options = options || {};
   
     const storage: Storage = await storageInit();

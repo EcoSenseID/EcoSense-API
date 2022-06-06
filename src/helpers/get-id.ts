@@ -1,5 +1,5 @@
-import getUid from "../firebase-auth/getUid";
-import pool from "../pool";
+import getUid from "../firebase-auth/getUid.js";
+import pool from "../pool.js";
 
 const getIdFromIdToken = async (authorization: string) => {
     if (!authorization)

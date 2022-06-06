@@ -1,9 +1,9 @@
-import pool from '../pool';
-import getUid from '../firebase-auth/getUid';
-import { sendUploadToGCSFunc } from '../helpers/google-cloud-storage';
+import pool from '../pool.js';
+import getUid from '../firebase-auth/getUid.js';
+import { sendUploadToGCSFunc } from '../helpers/google-cloud-storage.js';
 
 import { Request, Response } from 'express';
-import getIdFromIdToken from '../helpers/get-id';
+import getIdFromIdToken from '../helpers/get-id.js';
 
 // const uploadFileToGCS = (req, res, next) => {
 //     if (req.file && req.file.gcsUrl) {
@@ -366,7 +366,7 @@ export const getCampaignParticipant = async (request: Request, response: Respons
     //   VALUES (${campaignId}, 1, false, '${currentDate}', '${currentDate}');
     //   SELECT * FROM campaign_participant WHERE id_campaign = ${campaignId} AND id_user = 1;
     // `;
-    console.log(queryString);
+    // console.log(queryString);
     const results: any = await pool.query(queryString);
     // if (results[1].rows.length !== 0) {
     //   response.status(200).json({ error: false, message: "Success" });

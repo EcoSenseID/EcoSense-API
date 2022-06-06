@@ -3,14 +3,14 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import Multer from 'multer';
 
-import * as db_api from './sql-queries/q_mdapi';
-import * as db_webapi from './sql-queries/q_webapi';
+import * as db_api from './sql-queries/q_mdapi.js';
+import * as db_webapi from './sql-queries/q_webapi.js';
 
 // import * as gcsMiddlewares from './middlewares/google-cloud-storage';
-import {isAuthenticatedMobile, isAuthenticatedWeb} from './middlewares/auth-middleware';
+import {isAuthenticatedMobile, isAuthenticatedWeb} from './middlewares/auth-middleware.js';
 
 // env
-import { PORT } from './env_config';
+import { PORT } from './env_config.js';
 
 // Initializing express
 const app: Express = express();

@@ -1,6 +1,6 @@
-import { getPublicUrl } from '../helpers/google-cloud-storage';
+import { getPublicUrl } from '../helpers/google-cloud-storage.js';
 import { Request, Response, NextFunction } from 'express';
-import { storageInit } from '../helpers/secret-manager';
+import { storageInit } from '../helpers/secret-manager.js';
 import { Storage } from '@google-cloud/storage';
 
 const DEFAULT_BUCKET_NAME = 'ecosense-campaign-posters'; // Replace with the name of your bucket

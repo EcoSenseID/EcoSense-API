@@ -1,5 +1,5 @@
-import * as admin from 'firebase-admin';
-import { firebaseInit } from '../helpers/secret-manager';
+import admin from 'firebase-admin';
+import { firebaseInit } from '../helpers/secret-manager.js';
 
 firebaseInit();
 

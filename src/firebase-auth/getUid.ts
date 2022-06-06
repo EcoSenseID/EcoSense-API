@@ -1,4 +1,4 @@
-import admin from './admin';
+import admin from './admin.js';
 
 // idToken comes from the client app
 const getUid = async (authorization: string) => {

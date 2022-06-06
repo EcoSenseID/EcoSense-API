@@ -1,4 +1,4 @@
-import pool from '../pool';
+import pool from '../pool.js';
 
 const getIdCheckUserFromUid = async (uid: String) => {
     // console.log('uid getID', uid);

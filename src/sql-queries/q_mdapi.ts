@@ -1,10 +1,8 @@
-import pool from '../pool';
-import getUid from '../firebase-auth/getUid';
-import getIdCheckUserFromUid from '../helpers/check-user';
-import { sendUploadToGCSFunc } from '../helpers/google-cloud-storage';
+import pool from '../pool.js';
+import { sendUploadToGCSFunc } from '../helpers/google-cloud-storage.js';
 import { Request, Response } from 'express';
-import getIdFromIdToken from '../helpers/get-id';
-import { convertToUnixTimestamp } from '../helpers/helpers';
+import getIdFromIdToken from '../helpers/get-id.js';
+import { convertToUnixTimestamp } from '../helpers/helpers.js';
 
 // TODO: DONE!
 export const getCampaign = async (request: Request, response: Response) => {

@@ -1,6 +1,10 @@
 import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
 import { Storage } from '@google-cloud/storage';
-import * as admin from 'firebase-admin';
+import admin from 'firebase-admin';
+
+import pg from 'pg';
+// import fs from 'fs';
+import { DB_USER, DB_HOST, DB_NAME, DB_PWD, DB_PORT } from '../env_config.js';
 
 const client = new SecretManagerServiceClient();
 let credentials: admin.app.App;
@@ -42,4 +46,39 @@ export const storageInit = async (): Promise<Storage> => {
         credentials: result,
     });
     return storage;
+}
+
+export const poolInit = async (): Promise<any> => {
+    const [version1] = await client.accessSecretVersion({
+        name: 'projects/700975405784/secrets/cloud-sql-clientkey/versions/2'
+    });
+    const keyResult = version1.payload!.data!.toString();
+
+    const [version2] = await client.accessSecretVersion({
+        name: 'projects/700975405784/secrets/cloud-sql-serverca/versions/1'
+    })
+    const caResult = version2.payload!.data!.toString();
+
+    const [version3] = await client.accessSecretVersion({
+        name: 'projects/700975405784/secrets/cloud-sql-clientcert/versions/1'
+    })
+    const certResult = version3.payload!.data!.toString();
+
+    const pool = new pg.Pool({
+        user: DB_USER,
+        host: DB_HOST,
+        database: DB_NAME,
+        password: DB_PWD,
+        port: parseInt(DB_PORT!),
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 2000,
+        ssl: {
+          rejectUnauthorized: false,
+          ca: caResult,
+          key: keyResult,
+          cert: certResult,
+        },
+        allowExitOnIdle: true
+    });
+    return pool;
 }
