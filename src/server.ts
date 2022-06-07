@@ -47,7 +47,12 @@ const multer = Multer({
 app.get('/', (request: Request, response: Response) => {
     response.status(200).json({ 
       status: 'success',
-      info: 'Welcome to EcoSense API! This API is built using Typescript, Node.js, Express and Postgres API.' 
+      info: 'Welcome to EcoSense API! This API is built using Typescript, Node.js, Express and PostgreSQL.',
+      contributors: {
+        names: ['Darren Ngoh', 'Mirsa Salsabila', 'Deddy Romnan Rumapea', 'Rivano Ardiyan Taufiq Kurniawan', 'Kenrick Tandrian', 'Kenji Marwies'],
+        team: 'C22-PS279'
+      },
+      copyright: 'EcoSense © 2022. Bangkit Academy 2022. All Rights Reserved.'
     });
 });
 

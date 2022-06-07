@@ -55,26 +55,37 @@ export const loginToWeb = async (request: Request, response: Response) => {
   const { authorization } = request.headers;
 
   try {
+    const { displayName } = request.body;
     const uid = await getUid(authorization!);
 
     // CHECK IF UID EXISTS IN TABLE
     let hasExisted = false;
-    const queryString1 = `SELECT id FROM users WHERE firebase_uid = '${uid}';`;
+    const queryString1 = `SELECT id, name FROM users WHERE firebase_uid = '${uid}';`;
     const results1 = await pool.query(queryString1);
     if (results1.rows.length === 0) {
       hasExisted = false;
     } else {
       hasExisted = true;
-      response.status(200).json({
-        error: false,
-        message: "UID existed. Login success!"
-      });
-      return;
+      if (results1.rows[0].name && results1.rows[0].name == displayName) {
+        response.status(200).json({
+          error: false,
+          message: "UID existed. Login success!"
+        });
+        return;
+      } else {
+        const queryString3 = `UPDATE users SET name = '${displayName}' WHERE firebase_uid = '${uid}';`;
+        const results3 = await pool.query(queryString3);
+        response.status(200).json({
+          error: false,
+          message: "UID existed and name updated. Login success!"
+        });
+        return;
+      }
     }
 
     if (!hasExisted) {
       const queryString2 = `
-        INSERT INTO users (firebase_uid) VALUES ('${uid}') RETURNING id;
+        INSERT INTO users (firebase_uid, name) VALUES ('${uid}', '${displayName}') RETURNING id;
         INSERT INTO user_role (id_user, id_role) SELECT id, 1 FROM users WHERE firebase_uid = '${uid}' RETURNING id_user;
       `;
       const results2: any = await pool.query(queryString2);
@@ -446,6 +457,8 @@ export const getCampaignParticipant = async (request: Request, response: Respons
     return;
   }
 }
+
+// New API TODO: updateDisplayName, so that name in users table updates when user change name in firebase.
 
 // module.exports = {
 //     getTrendingCampaigns,
