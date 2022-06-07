@@ -209,48 +209,70 @@ export const getCampaignDetail = async (request: Request, response: Response) =>
             ON campaigns.id = a.id_campaign
             LEFT JOIN ( SELECT id_campaign, COUNT(id_user) as participant_count FROM campaign_participant GROUP BY id_campaign) AS b
             ON campaigns.id = b.id_campaign
-            LEFT JOIN ( SELECT id_campaign, array_agg(json_build_object('id', id, 'name', name)) as tasks FROM tasks GROUP BY id_campaign) AS c
+            LEFT JOIN ( SELECT id_campaign, array_agg(json_build_object('id', id, 'name', name, 'require_proof', require_proof)) as tasks FROM tasks GROUP BY id_campaign) AS c
             ON campaigns.id = c.id_campaign
             WHERE id = ${campaignId};
             SELECT * FROM categories ORDER BY id;
-            SELECT id_campaign FROM campaign_participant WHERE id_user = ${id}
+            SELECT id_campaign FROM campaign_participant WHERE id_user = ${id};
+            SELECT * FROM completed_tasks LEFT JOIN (SELECT id_campaign, id FROM tasks) as e ON completed_tasks.id_task = e.id 
+            WHERE e.id_campaign = ${campaignId} AND completed_tasks.id_user = ${id};
         `;
-        pool.query(queryString, (error: Error, results: any) => {
-            const categoriesList = results[1].rows;
-            // const campaign_participant = results[2].rows;
-            const campaign_participant = [
-                {
-                    id_campaign: 3,
-                },
-                {
-                    id_campaign: 2,
-                },
-                {
-                    id_campaign: 1,
-                },
-            ]
-            const joinedList = campaign_participant.map(data => data.id_campaign);
-            console.log(joinedList);
-            response.status(200).json({
-                error: false,
-                message: "Categories fetched successfully",
-                ...results[0].rows.map((data: any) => ({
-                    participantsCount: data.participant_count || 0,
-                    category: (data.category || []).map((data: number) => (
-                        categoriesList.filter((category: { id: number; }) => category.id === data)[0].name
-                    )),
-                    title: data.title,
-                    posterUrl: data.poster_url,
-                    isTrending: !data.participant_count ? false : data.participant_count > 100 ? true : false,
-                    isNew: Math.round((new Date().getTime() - data.start_date.getTime())/(1000*60*60*24)) <= 7,
-                    initiator: data.id_initiator,
-                    startDate: convertToUnixTimestamp(data.start_date),
-                    endDate: convertToUnixTimestamp(data.end_date),
-                    description: data.description,
-                    joined: joinedList.includes(campaignId),
-                    tasks: data.tasks
-                }))[0]
-            });
+        const results = await pool.query(queryString);
+        const categoriesList = results[1].rows;
+        const campaign_participant = results[2].rows;
+        const completed_tasks = results[3].rows;
+        // console.log(completed_tasks);
+        const joinedList = campaign_participant.map((data: { id_campaign: number; }) => data.id_campaign);
+        // console.log(joinedList);
+
+        response.status(200).json({
+            error: false,
+            message: "Categories fetched successfully",
+            ...results[0].rows.map((data: any) => ({
+                participantsCount: data.participant_count || 0,
+                category: (data.category || []).map((data: number) => (
+                    categoriesList.filter((category: { id: number; }) => category.id === data)[0].name
+                )),
+                title: data.title,
+                posterUrl: data.poster_url,
+                isTrending: !data.participant_count ? false : data.participant_count > 100 ? true : false,
+                isNew: Math.round((new Date().getTime() - data.start_date.getTime())/(1000*60*60*24)) <= 7,
+                initiator: data.id_initiator,
+                startDate: convertToUnixTimestamp(data.start_date),
+                endDate: convertToUnixTimestamp(data.end_date),
+                description: data.description,
+                joined: joinedList.includes(campaignId),
+                tasks: data.tasks.map((data: any) => {
+                    const completedTaskForThisTaskId = completed_tasks.filter((task: { id_task: number; }) => task.id_task === data.id);
+
+                    if (completedTaskForThisTaskId.length > 0) {
+                        if (data.require_proof) {
+                            return ({
+                                id: data.id,
+                                name: data.name,
+                                completed: true,
+                                proofPhotoUrl: completedTaskForThisTaskId[0].photo_url || '',
+                                proofCaption: '',
+                                completedTimeStamp: convertToUnixTimestamp(completedTaskForThisTaskId[0].timestamp)
+                            })
+                        } else {
+                            return ({
+                                id: data.id,
+                                name: data.name,
+                                completed: true,
+                                proofCaption: '',
+                                completedTimeStamp: convertToUnixTimestamp(completedTaskForThisTaskId[0].timestamp)
+                            })
+                        }
+                    } else {
+                        return ({
+                            id: data.id,
+                            name: "Water any trees near your house",
+                            completed: false
+                        })
+                    }
+                })
+            }))[0]
         });
     }
     catch(error: any) {
