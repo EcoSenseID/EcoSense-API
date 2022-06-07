@@ -334,8 +334,7 @@ export const getMyCampaigns = async (request: Request, response: Response) => {
               isNew: Math.round((new Date().getTime() - data.start_date.getTime())/(1000*60*60*24)) <= 7,
               canEditTask: results[2].rows.filter((completedTask: { id_campaign: any; }) => completedTask.id_campaign === data.id).length === 0
             })
-          }),
-          result: results[2].rows
+          })
       });
     } else {
       response.status(400).json({
