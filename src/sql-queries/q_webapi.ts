@@ -167,12 +167,14 @@ export const editCampaign = async (request: Request, response: Response) => {
   const { authorization } = request.headers;
   const newCampaignData = JSON.parse(request.body.newCampaignData);
   const posterChanged = JSON.parse(request.body.posterChanged);
+  const previousNoOfTask = JSON.parse(request.body.previousNoOfTask);
   const posterFile = request.file;
   // console.log('posterChanged', posterChanged);
   // console.log('posterFile', posterFile);
 
   try {
     const { id: userId } = await getIdFromIdToken(authorization!);
+    // console.log(newCampaignData);
     const {
       id,
       title,
@@ -181,8 +183,10 @@ export const editCampaign = async (request: Request, response: Response) => {
       tasks,
       startDate,
       endDate,
-      posterUrl
+      posterUrl,
+      canEditTask
     } = newCampaignData;
+    const currentNoOfTask = tasks.length;
 
     let posterGCSURL = posterUrl;
     if (posterChanged === true) {
@@ -200,22 +204,60 @@ export const editCampaign = async (request: Request, response: Response) => {
       }
     }
 
-    const queryString = `UPDATE campaigns 
-      SET title = '${title}', description = '${description}', start_date = '${startDate}', end_date = '${endDate}', poster_url = '${posterGCSURL}'
-      WHERE id = ${id}
-      RETURNING id;
-      DELETE FROM category_campaign WHERE id_campaign = ${id};
-      ${categories.map((data: { id: number; earned_experience_point: number; }) => 
-        (`INSERT INTO category_campaign (id_category, id_campaign, earned_experience_point) VALUES (${data.id}, ${id}, ${data.earned_experience_point});`)
-      ).join(' ')}
-      DELETE FROM tasks WHERE id_campaign = ${id};
-      ${tasks.map((data: { order_number: number; name: string; require_proof: boolean; }) => 
-        (`INSERT INTO tasks (id_campaign, order_number, name, require_proof) VALUES (${id}, ${data.order_number}, '${data.name}', ${data.require_proof});`)
-      ).join(' ')}
-    `;
+    let queryString: string;
+    if (canEditTask) {
+      let taskQueryString: string = '';
+      if (previousNoOfTask < currentNoOfTask) {
+        for (let i = 1; i <= previousNoOfTask; i++) {
+          const currentTask = tasks.filter((task: { order_number: number; }) => task.order_number == i)[0];
+          taskQueryString += `UPDATE tasks SET name = '${currentTask.name}', require_proof = ${currentTask.require_proof} WHERE id_campaign = ${id} AND order_number = ${currentTask.order_number}; `;
+        }
+        for (let i = previousNoOfTask + 1; i <= currentNoOfTask; i++) {
+          const currentTask = tasks.filter((task: { order_number: number; }) => task.order_number == i)[0];
+          taskQueryString += `INSERT INTO tasks (id_campaign, order_number, name, require_proof) VALUES (${id}, ${i}, '${currentTask.name}', ${currentTask.require_proof}); `;
+        }
+      } else if (previousNoOfTask === currentNoOfTask) {
+        for (let i = 1; i <= previousNoOfTask; i++) {
+          const currentTask = tasks.filter((task: { order_number: number; }) => task.order_number == i)[0];
+          taskQueryString += `UPDATE tasks SET name = '${currentTask.name}', require_proof = ${currentTask.require_proof} WHERE id_campaign = ${id} AND order_number = ${currentTask.order_number}; `;
+        }
+      } else {
+        for (let i = 1; i <= previousNoOfTask; i++) {
+          const currentTask = tasks.filter((task: { order_number: number; }) => task.order_number == i)[0];
+          taskQueryString += `UPDATE tasks SET name = '${currentTask.name}', require_proof = ${currentTask.require_proof} WHERE id_campaign = ${id} AND order_number = ${currentTask.order_number}; `;
+        }
+        for (let i = previousNoOfTask + 1; i <= currentNoOfTask; i++) {
+          const currentTask = tasks.filter((task: { order_number: number; }) => task.order_number == i)[0];
+          taskQueryString += `DELETE FROM tasks WHERE id_campaign = ${id} AND order_number = ${currentTask.order_number}; `;
+        }
+      }
+      queryString = `UPDATE campaigns 
+        SET title = '${title}', description = '${description}', start_date = '${startDate}', end_date = '${endDate}', poster_url = '${posterGCSURL}'
+        WHERE id = ${id}
+        RETURNING id;
+        DELETE FROM category_campaign WHERE id_campaign = ${id};
+        ${categories.map((data: { id: number; earned_experience_point: number; }) => 
+          (`INSERT INTO category_campaign (id_category, id_campaign, earned_experience_point) VALUES (${data.id}, ${id}, ${data.earned_experience_point});`)
+        ).join(' ')}
+        SELECT setval('tasks_id_seq', (SELECT MAX(id) FROM tasks));
+        ${taskQueryString}
+      `;
+    } else {
+      queryString = `UPDATE campaigns 
+        SET title = '${title}', description = '${description}', start_date = '${startDate}', end_date = '${endDate}', poster_url = '${posterGCSURL}'
+        WHERE id = ${id}
+        RETURNING id;
+        DELETE FROM category_campaign WHERE id_campaign = ${id};
+        ${categories.map((data: { id: number; earned_experience_point: number; }) => 
+          (`INSERT INTO category_campaign (id_category, id_campaign, earned_experience_point) VALUES (${data.id}, ${id}, ${data.earned_experience_point});`)
+        ).join(' ')}
+      `;
+    }
+    
     // console.log(queryString);
     const results: any = await pool.query(queryString);
     if (results[0].rows[0].id){
+    // if (true) {
       response.status(200).json({
         error: false, 
         message: 'Edit campaign success!'
