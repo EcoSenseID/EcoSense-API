@@ -297,10 +297,11 @@ export const getMyCampaigns = async (request: Request, response: Response) => {
       ON campaigns.id = a.id_campaign
       LEFT JOIN (SELECT id_campaign, COUNT(id_user) as participant_count FROM campaign_participant GROUP BY id_campaign) AS b
       ON campaigns.id = b.id_campaign
-      LEFT JOIN (SELECT id_campaign, array_agg(json_build_object('order_number', order_number, 'name', name, 'require_proof', require_proof)) as task FROM tasks GROUP BY id_campaign) AS c
+      LEFT JOIN (SELECT id_campaign, array_agg(json_build_object('id_task', id, 'order_number', order_number, 'name', name, 'require_proof', require_proof)) as task FROM tasks GROUP BY id_campaign) AS c
       ON campaigns.id = c.id_campaign
       WHERE id_initiator = ${id}
       ORDER BY id;
+      SELECT completed_tasks.id_task, e.id_campaign FROM completed_tasks LEFT JOIN (SELECT id_campaign, id FROM tasks) as e ON completed_tasks.id_task = e.id; 
     `;
     // console.log(queryString);
     const results: any = await pool.query(queryString);
@@ -315,7 +316,8 @@ export const getMyCampaigns = async (request: Request, response: Response) => {
           error: false,
           message: "Campaigns fetched successfully",
           timestamp: new Date(),
-          campaigns: campaignsList.map((data: any) => ({
+          campaigns: campaignsList.map((data: any) => {
+            return ({
               id: data.id,
               posterUrl: data.poster_url,
               title: data.title,
@@ -325,12 +327,15 @@ export const getMyCampaigns = async (request: Request, response: Response) => {
               categories: (data.category || []).map((data: { id_category: number; earned_experience_point: number}) => ({
                   ...categoriesList.filter((category: { id: number; }) => category.id === data.id_category)[0],
                   earned_experience_point: data.earned_experience_point
-            })),
+              })),
               tasks: data.task,
               participantsCount: parseInt(data.participant_count) || 0,
-              isTrending: !data.participant_count ? false : parseInt(data.participant_count) > 1000 ? true : false,
-              isNew: Math.round((new Date().getTime() - data.start_date.getTime())/(1000*60*60*24)) <= 7
-          }))
+              isTrending: !data.participant_count ? false : parseInt(data.participant_count) > 100 ? true : false,
+              isNew: Math.round((new Date().getTime() - data.start_date.getTime())/(1000*60*60*24)) <= 7,
+              canEditTask: results[2].rows.filter((completedTask: { id_campaign: any; }) => completedTask.id_campaign === data.id).length === 0
+            })
+          }),
+          result: results[2].rows
       });
     } else {
       response.status(400).json({

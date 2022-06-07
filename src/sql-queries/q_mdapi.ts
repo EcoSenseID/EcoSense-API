@@ -48,7 +48,7 @@ export const getCampaign = async (request: Request, response: Response) => {
                         categoriesList.filter((category: { id: number; }) => category.id === data)[0].name
                     )),
                     participantsCount: data.participant_count || 0,
-                    isTrending: !data.participant_count ? false : data.participant_count > 1000 ? true : false,
+                    isTrending: !data.participant_count ? false : data.participant_count > 100 ? true : false,
                     isNew: Math.round((new Date().getTime() - data.start_date.getTime())/(1000*60*60*24)) <= 7
                 }))
                 // campaigns: results.rows
@@ -96,7 +96,7 @@ export const getDashboard = async (request: Request, response: Response) => {
                     categoriesList.filter((category: { id: number; }) => category.id === data)[0].name
                 )),
                 participantsCount: data.participant_count || 0,
-                isTrending: !data.participant_count ? false : data.participant_count > 1000 ? true : false,
+                isTrending: !data.participant_count ? false : data.participant_count > 100 ? true : false,
                 isNew: Math.round((new Date().getTime() - data.start_date.getTime())/(1000*60*60*24)) <= 7
             }));
             const taskList = results[3].rows;
@@ -241,7 +241,7 @@ export const getCampaignDetail = async (request: Request, response: Response) =>
                     )),
                     title: data.title,
                     posterUrl: data.poster_url,
-                    isTrending: !data.participant_count ? false : data.participant_count > 1000 ? true : false,
+                    isTrending: !data.participant_count ? false : data.participant_count > 100 ? true : false,
                     isNew: Math.round((new Date().getTime() - data.start_date.getTime())/(1000*60*60*24)) <= 7,
                     initiator: data.id_initiator,
                     startDate: convertToUnixTimestamp(data.start_date),
@@ -315,7 +315,7 @@ export const getContributions = async (request: Request, response: Response) => 
                     categoriesList.filter((category: { id: number; }) => category.id === data)[0].name
                 )),
                 participantsCount: data.participant_count || 0,
-                isTrending: !data.participant_count ? false : data.participant_count > 1000 ? true : false,
+                isTrending: !data.participant_count ? false : data.participant_count > 100 ? true : false,
                 isNew: Math.round((new Date().getTime() - data.start_date.getTime())/(1000*60*60*24)) <= 7
             }));
             const experiencePoints = results[3].rows.map((data: any) => ({
@@ -413,7 +413,7 @@ export const postProof = async (request: Request, response: Response) => {
         });
     }
     catch (err: any) {
-        response.status(err.code || 400).json({
+        response.status(400).json({
             error: true, message: err.message
         });
     }
@@ -449,7 +449,7 @@ export const postCompleteCampaign = async (request: Request, response: Response)
         });
     }
     catch (err: any) {
-        response.status(err.code || 400).json({
+        response.status(400).json({
             error: true, message: err.message
         });
     }
@@ -478,7 +478,7 @@ export const joinCampaign = async (request: Request, response: Response) => {
         })
     }
     catch (err: any) {
-        response.status(err.code || 400).json({
+        response.status(400).json({
             error: true, message: err.message
         });
     }
@@ -514,7 +514,7 @@ export const getRecognisables = async (request: Request, response: Response) => 
         }
     }
     catch (err: any) {
-        response.status(err.code || 400).json({
+        response.status(400).json({
             error: true, message: err.message
         });
     }
