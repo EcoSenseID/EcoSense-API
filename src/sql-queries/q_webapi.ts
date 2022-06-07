@@ -45,7 +45,7 @@ export const getTrendingCampaigns = (request: Request, response: Response) => {
       })
     }
     catch (error: any) {
-      response.status(error.code || 400).json({
+      response.status(400).json({
         error: true, message: error.message
       });
     }
@@ -94,7 +94,7 @@ export const loginToWeb = async (request: Request, response: Response) => {
     }
   }
   catch(error: any) {
-    response.status(error.code || 400).json({
+    response.status(400).json({
       error: true, message: error.message
     });
   }
@@ -157,7 +157,7 @@ export const addNewCampaign = async (request: Request, response: Response) => {
     }
   }
   catch (error: any) {
-    response.status(error.code || 400).json({
+    response.status(400).json({
       error: true, message: error.message
     }); return;
   }
@@ -229,7 +229,7 @@ export const editCampaign = async (request: Request, response: Response) => {
     }
   }
   catch (error: any) {
-    response.status(error.code || 400).json({
+    response.status(400).json({
       error: true, message: error.message
     }); return;
   }
@@ -256,7 +256,7 @@ export const deleteCampaign = async (request: Request, response: Response) => {
     }
   }
   catch (error: any) {
-    response.status(error.code || 400).json({
+    response.status(400).json({
       error: true, message: error.message
     }); return;
   }
@@ -277,7 +277,7 @@ export const getAllCategories = (request: Request, response: Response) => {
       });
   }
   catch(error: any) {
-      response.status(error.code || 400).json({
+      response.status(400).json({
           error: true, message: error.message
       });
   }

@@ -31,7 +31,7 @@ const corsOptions = {
     'https://ecosense-web-of7z476jgq-as.a.run.app',
   ],
   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'HEAD'],
   preflightContinue: true
 }
 app.use(cors(corsOptions));
