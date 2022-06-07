@@ -27,7 +27,8 @@ const corsOptions = {
   origin: [
     // 'https://ecosense-web.herokuapp.com', 
     'http://localhost:3000', 
-    'https://ecosense.vercel.app'
+    'https://ecosense.vercel.app',
+    'https://ecosense-web-of7z476jgq-as.a.run.app'
   ],
   optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 }
