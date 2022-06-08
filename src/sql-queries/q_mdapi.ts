@@ -253,7 +253,7 @@ export const getCampaignDetail = async (request: Request, response: Response) =>
                     } else {
                         return ({
                             id: data.id,
-                            name: "Water any trees near your house",
+                            name: data.name,
                             completed: false
                         })
                     }
