@@ -196,11 +196,11 @@ export const getCampaignDetail = async (request: Request, response: Response) =>
             ON campaigns.id = b.id_campaign
             LEFT JOIN ( SELECT id_campaign, array_agg(json_build_object('id', id, 'name', name, 'require_proof', require_proof)) as tasks FROM tasks GROUP BY id_campaign) AS c
             ON campaigns.id = c.id_campaign
-            LEFT JOIN ( SELECT id, name FROM users) AS d ON campaigns.id_initiator = d.id
-            WHERE id = ${campaignId};
+            LEFT JOIN ( SELECT users.id, name AS initiator_name FROM users) AS d ON campaigns.id_initiator = d.id
+            WHERE campaigns.id = ${campaignId};
             SELECT * FROM categories ORDER BY id;
             SELECT id_campaign FROM campaign_participant WHERE id_user = ${id};
-            SELECT * FROM completed_tasks LEFT JOIN (SELECT id_campaign, id FROM tasks) as e ON completed_tasks.id_task = e.id 
+            SELECT * FROM completed_tasks LEFT JOIN (SELECT id_campaign, tasks.id AS id_task FROM tasks) as e ON completed_tasks.id_task = e.id_task 
             WHERE e.id_campaign = ${campaignId} AND completed_tasks.id_user = ${id};
         `;
         const results = await pool.query(queryString);
@@ -223,7 +223,7 @@ export const getCampaignDetail = async (request: Request, response: Response) =>
                 posterUrl: data.poster_url,
                 isTrending: !data.participant_count ? false : data.participant_count > 100 ? true : false,
                 isNew: Math.round((new Date().getTime() - data.start_date.getTime())/(1000*60*60*24)) <= 7,
-                initiator: data.id_initiator,
+                initiator: data.initiator_name,
                 startDate: convertToUnixTimestamp(data.start_date),
                 endDate: convertToUnixTimestamp(data.end_date),
                 description: data.description,
