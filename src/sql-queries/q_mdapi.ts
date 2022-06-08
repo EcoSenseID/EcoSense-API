@@ -238,7 +238,7 @@ export const getCampaignDetail = async (request: Request, response: Response) =>
                                 name: data.name,
                                 completed: true,
                                 proofPhotoUrl: completedTaskForThisTaskId[0].photo_url || '',
-                                proofCaption: '',
+                                proofCaption: data.caption || '',
                                 completedTimeStamp: convertToUnixTimestamp(completedTaskForThisTaskId[0].timestamp)
                             })
                         } else {
@@ -246,7 +246,7 @@ export const getCampaignDetail = async (request: Request, response: Response) =>
                                 id: data.id,
                                 name: data.name,
                                 completed: true,
-                                proofCaption: '',
+                                proofCaption: data.caption || '',
                                 completedTimeStamp: convertToUnixTimestamp(completedTaskForThisTaskId[0].timestamp)
                             })
                         }
@@ -294,7 +294,7 @@ export const getContributions = async (request: Request, response: Response) => 
                 id: data.id,
                 posterUrl: data.poster_url,
                 title: data.title,
-                endDate: data.end_date,
+                endDate: convertToUnixTimestamp(data.end_date),
                 category: (data.category || []).map((data: number) => (
                     categoriesList.filter((category: { id: number; }) => category.id === data)[0].name
                 )),
@@ -345,7 +345,8 @@ export const getContributions = async (request: Request, response: Response) => 
 // TODO: DONE!
 export const postProof = async (request: Request, response: Response) => {
     const { authorization } = request.headers;
-    const taskId = parseInt(request.body.taskId);
+    const taskId: number = parseInt(request.body.taskId);
+    const caption: string = request.body.caption || '';
     const photo = request.file;
 
     try {
@@ -384,7 +385,7 @@ export const postProof = async (request: Request, response: Response) => {
         const currentDate = new Date().toISOString();
         // Insert to Database
         const queryString2 = `
-            INSERT INTO completed_tasks (id_task, id_user, photo_url, timestamp) VALUES (${taskId}, ${id}, '${photoGCSURL}', '${currentDate}') RETURNING photo_url;
+            INSERT INTO completed_tasks (id_task, id_user, photo_url, timestamp, caption) VALUES (${taskId}, ${id}, '${photoGCSURL}', '${currentDate}', '${caption}') RETURNING photo_url;
             SELECT * FROM completed_tasks WHERE photo_url = '${photoGCSURL}';
         `;
         // console.log(queryString2);
