@@ -294,11 +294,11 @@ export const deleteCampaign = async (request: Request, response: Response) => {
 
   try {
     const queryString = `
-      DELETE from campaigns WHERE id=${id}; 
-      SELECT setval('campaigns_id_seq', (SELECT MAX(id) FROM campaigns));
       DELETE FROM category_campaign WHERE id_campaign = ${id};
       DELETE FROM tasks WHERE id_campaign = ${id};
-      SELECT setval('tasks_id_seq', (SELECT MAX(id) FROM tasks));`
+      SELECT setval('tasks_id_seq', (SELECT MAX(id) FROM tasks));
+      DELETE from campaigns WHERE id=${id}; 
+      SELECT setval('campaigns_id_seq', (SELECT MAX(id) FROM campaigns));`
     ;
     const results: any = await pool.query(queryString);
     if (results[0].rows[0].id){
