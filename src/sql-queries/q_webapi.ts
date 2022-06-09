@@ -290,18 +290,19 @@ export const editCampaign = async (request: Request, response: Response) => {
 
 export const deleteCampaign = async (request: Request, response: Response) => {
   const { authorization } = request.headers;
-  const { campaignId: id } = request.query; 
+  const reqQuery: any = request.query;
+  const id  = parseInt(reqQuery.campaignId);
 
   try {
     const queryString = `
       DELETE FROM category_campaign WHERE id_campaign = ${id};
       DELETE FROM tasks WHERE id_campaign = ${id};
       SELECT setval('tasks_id_seq', (SELECT MAX(id) FROM tasks));
-      DELETE from campaigns WHERE id=${id}; 
+      DELETE from campaigns WHERE id=${id} RETURNING id; 
       SELECT setval('campaigns_id_seq', (SELECT MAX(id) FROM campaigns));`
     ;
     const results: any = await pool.query(queryString);
-    if (results[0].rows[0].id){
+    if (parseInt(results[3].rows[0].id) === id){
       response.status(200).json({
         error: false, 
         message: 'Delete campaign success!'
@@ -321,18 +322,16 @@ export const deleteCampaign = async (request: Request, response: Response) => {
   }
 }
 
-export const getAllCategories = (request: Request, response: Response) => {
+export const getAllCategories = async (request: Request, response: Response) => {
   try {
       const queryString = `SELECT * FROM categories ORDER BY id;`;
-      pool.query(queryString, (error: Error, results: any) => {
-          response.status(200).json({
-              error: false,
-              message: "Categories fetched successfully",
-              categories: results.rows.map((data: { id: number; photo_url: string; name: string; color_hex: string; }) => ({
-                  id: data.id, photoUrl: data.photo_url, name: data.name, colorHex: data.color_hex
-              }))
-          });
-          if (error) throw error;
+      const results = await pool.query(queryString);
+      response.status(200).json({
+          error: false,
+          message: "Categories fetched successfully",
+          categories: results.rows.map((data: { id: number; photo_url: string; name: string; color_hex: string; }) => ({
+              id: data.id, photoUrl: data.photo_url, name: data.name, colorHex: data.color_hex
+          }))
       });
   }
   catch(error: any) {
