@@ -416,6 +416,8 @@ export const getCampaignParticipant = async (request: Request, response: Respons
       SELECT id_campaign, joined_timestamp, COUNT(id_user) AS user_count 
       FROM campaign_participant 
       WHERE id_campaign = ${campaignId} GROUP BY id_campaign, joined_timestamp ORDER BY joined_timestamp;
+      SELECT * FROM completed_tasks LEFT JOIN (SELECT id_campaign, tasks.id AS id_task, tasks.name, tasks.order_number FROM tasks) as e ON completed_tasks.id_task = e.id_task 
+      WHERE e.id_campaign = ${campaignId};
     `;
     // const currentDate = new Date(new Date().getTime() - 2*24*60*60*1000).toISOString();
     // const queryString = `
@@ -435,16 +437,17 @@ export const getCampaignParticipant = async (request: Request, response: Respons
       response.status(200).json({
         error: false,
         message: 'Campaign Participants fetched successfully',
-        id_campaign: results.rows[0].id_campaign,
+        id_campaign: campaignId,
         participants: [
-          ...results.rows.map((data: { joined_timestamp: Date; user_count: string; }) => {
+          ...results[0].rows.map((data: { joined_timestamp: Date; user_count: string; }) => {
             let dateOnly = data.joined_timestamp.toISOString().split('T')[0];
             return {
               date: `${parseInt(dateOnly.split('-')[2])}/${parseInt(dateOnly.split('-')[1])}`,
               registrationCount: parseInt(data.user_count)
             }
           })
-        ]
+        ],
+        completed_tasks: results[1].rows
       });
     } else {
       response.status(400).json({

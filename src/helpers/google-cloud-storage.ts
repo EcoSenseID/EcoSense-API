@@ -12,7 +12,7 @@ export const copyFileToGCS = async (localFilePath: string, bucketName: string, o
     const fileName = path.basename(localFilePath);
     const gcsName = `${Date.now()}-${fileName}`;
     const file = bucket.file(gcsName);
-    console.log(fileName);
+    // console.log(fileName);
   
     return bucket.upload(localFilePath, options)
       .then(() => file.makePublic())

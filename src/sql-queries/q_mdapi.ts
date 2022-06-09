@@ -180,7 +180,7 @@ export const getDashboard = async (request: Request, response: Response) => {
         });
     }
     catch (error: any) {
-        console.log(error);
+        // console.log(error);
         response.status(400).json({
             error: true, message: error.message
         });
@@ -562,7 +562,7 @@ export const postRecognisables = async (request:Request, response:Response) => {
             VALUES (${id}, '${label}', '${currentDate}', ${confidencePercent}) RETURNING id;
             SELECT id FROM histories WHERE id_user = ${id} AND timestamp = '${currentDate}';
         `;
-        console.log(queryString);
+        // console.log(queryString);
         const results: any = await pool.query(queryString);
         if (results[0].rows[0].id === results[1].rows[0].id) {
             response.status(200).json({ error: false, message: "Success", recognisableId: results[0].rows[0].id });
