@@ -459,20 +459,40 @@ export const postCompleteCampaign = async (request: Request, response: Response)
             SET is_completed = true, completed_timestamp = '${currentDate}'
             WHERE id_campaign = ${campaignId} AND id_user = ${id};
             SELECT is_completed FROM campaign_participant WHERE id_campaign = ${campaignId} AND id_user = ${id};
+            SELECT id_category, id_campaign, earned_experience_point FROM category_campaign WHERE id_campaign = ${campaignId};
+            SELECT id_category, id_user, experience_point FROM user_experience_points WHERE id_user = ${id};
         `;
-        pool.query(queryString, (error: Error, results: any) => {
-            const isCompleted = results[1].rows[0].is_completed;
-            if (isCompleted) {
-                response.status(200).json({
-                    error: false, message: "Success"
-                });
-            } else {
-                response.status(400).json({
-                    error: true,
-                    message: "Update DB not successful"
-                });
-            }
-        });
+        const results = await pool.query(queryString);
+        const isCompleted = results[1].rows[0].is_completed;
+        if (isCompleted) {
+            const expGiven = results[2].rows.map((data: any) => ({
+                categoryId: parseInt(data.id_category),
+                exp: parseInt(data.earned_experience_point)
+            }));
+            const currentExp = results[3].rows.map((data: any) => ({
+                categoryId: parseInt(data.id_category),
+                exp: parseInt(data.experience_point)
+            }));
+
+            let queryString1 = '';
+            expGiven.map((data: any) => {
+                queryString1 += `
+                    UPDATE user_experience_points 
+                    SET experience_point = ${currentExp.filter((cData: { categoryId: number; }) => cData.categoryId === data.categoryId)[0].exp + data.exp} 
+                    WHERE id_category = ${data.categoryId} AND id_user = ${id};
+                `;
+            });
+            // console.log(queryString1);
+            const results1 = await pool.query(queryString1);
+            response.status(200).json({
+                error: false, message: "Success"
+            });
+        } else {
+            response.status(400).json({
+                error: true,
+                message: "Update DB not successful"
+            });
+        }
     }
     catch (err: any) {
         response.status(400).json({
