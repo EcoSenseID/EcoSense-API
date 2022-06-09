@@ -95,24 +95,44 @@ export const getDashboard = async (request: Request, response: Response) => {
             isTrending: !data.participant_count ? false : data.participant_count > 100 ? true : false,
             isNew: Math.round((new Date().getTime() - data.start_date.getTime())/(1000*60*60*24)) <= 7
         }));
-        const joinedList = results[2].rows;
-        console.log(joinedList);
+        let joinedList = results[2].rows;
+        // console.log('joinedList', joinedList);
         const taskList = results[3].rows;
+        // console.log('taskList', taskList);
         const completedTaskList = results[4].rows.map((data: { id_task: number; }) => (data.id_task));
+        // console.log('completedTaskList', completedTaskList);
         
         response.status(200).json({
             error: false,
             message: "Dashboard fetched successfully",
             tasks: [
-                ...joinedList.filter((data: { is_completed: boolean; }) => data.is_completed == false).map(
-                    (currentCampaign: any) => {
+                ...joinedList.filter((data: any) => {
+                    if (data.is_completed == true) return false;
+                    else {
                         const tasksFromThisCampaign = taskList.filter(
-                            (task: { id_campaign: number; }) => task.id_campaign === currentCampaign.id_campaign
+                            (task: { id_campaign: number; }) => task.id_campaign === data.id_campaign
                         );
+                        // console.log('tasksFromThisCampaign', tasksFromThisCampaign);
                         const undoneTasks = tasksFromThisCampaign.filter((task: { id: number; }) => {
                             if (completedTaskList.includes(task.id)) return false;
                             return true;
                         }).sort((a: { order_number: number; }, b: { order_number: number; }) => a.order_number - b.order_number);
+                        // console.log('undoneTasks', undoneTasks);
+                        if (undoneTasks.length == 0) {
+                            return false;
+                        } else return true;
+                    }
+                }).map(
+                    (currentCampaign: any) => {
+                        const tasksFromThisCampaign = taskList.filter(
+                            (task: { id_campaign: number; }) => task.id_campaign === currentCampaign.id_campaign
+                        );
+                        // console.log('tasksFromThisCampaign', tasksFromThisCampaign);
+                        const undoneTasks = tasksFromThisCampaign.filter((task: { id: number; }) => {
+                            if (completedTaskList.includes(task.id)) return false;
+                            return true;
+                        }).sort((a: { order_number: number; }, b: { order_number: number; }) => a.order_number - b.order_number);
+                        // console.log('undoneTasks', undoneTasks);
 
                         return ({
                             id: undoneTasks[0].id,
@@ -127,7 +147,20 @@ export const getDashboard = async (request: Request, response: Response) => {
                 ),
             ],
             completedCampaigns: [
-                ...joinedList.filter((data: { is_completed: boolean; }) => data.is_completed == true).map(
+                ...joinedList.filter((data: { is_completed: boolean; id_campaign: number; }) => {
+                    const tasksFromThisCampaign = taskList.filter(
+                        (task: { id_campaign: number; }) => task.id_campaign === data.id_campaign
+                    );
+                    // console.log('tasksFromThisCampaign', tasksFromThisCampaign);
+                    const undoneTasks = tasksFromThisCampaign.filter((task: { id: number; }) => {
+                        if (completedTaskList.includes(task.id)) return false;
+                        return true;
+                    }).sort((a: { order_number: number; }, b: { order_number: number; }) => a.order_number - b.order_number);
+                    // console.log('undoneTasks', undoneTasks);
+                    if (undoneTasks.length == 0) {
+                        return true;
+                    } else return false;
+                }).map(
                     (data: { id_campaign: number; }) => {
                         const currentCampaignDetail = campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0];
 
@@ -147,6 +180,7 @@ export const getDashboard = async (request: Request, response: Response) => {
         });
     }
     catch (error: any) {
+        console.log(error);
         response.status(400).json({
             error: true, message: error.message
         });
@@ -238,7 +272,7 @@ export const getCampaignDetail = async (request: Request, response: Response) =>
                                 name: data.name,
                                 completed: true,
                                 proofPhotoUrl: completedTaskForThisTaskId[0].photo_url || '',
-                                proofCaption: data.caption || '',
+                                proofCaption: completedTaskForThisTaskId[0].caption || '',
                                 completedTimeStamp: convertToUnixTimestamp(completedTaskForThisTaskId[0].timestamp)
                             })
                         } else {
@@ -246,7 +280,7 @@ export const getCampaignDetail = async (request: Request, response: Response) =>
                                 id: data.id,
                                 name: data.name,
                                 completed: true,
-                                proofCaption: data.caption || '',
+                                proofCaption: completedTaskForThisTaskId[0].caption || '',
                                 completedTimeStamp: convertToUnixTimestamp(completedTaskForThisTaskId[0].timestamp)
                             })
                         }
