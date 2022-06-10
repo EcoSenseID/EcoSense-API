@@ -19,6 +19,7 @@ This is the back-end for EcoSense capstone project, which is included in the Ban
 [![Google Cloud](https://img.shields.io/badge/GoogleCloud-black.svg?style=for-the-badge&logo=google-cloud&logoColor=%234285F4)](https://github.com/EcoSenseID?tab=repositories)
 
 ## Dependencies
+### Production
 [![@google-cloud/secret-manager](https://img.shields.io/github/package-json/dependency-version/EcoSenseID/EcoSense-API/@google-cloud/secret-manager)](https://www.npmjs.com/package/@google-cloud/secret-manager)
 [![@google-cloud/storage](https://img.shields.io/github/package-json/dependency-version/EcoSenseID/EcoSense-API/@google-cloud/storage)](https://www.npmjs.com/package/@google-cloud/storage)
 [![cors](https://img.shields.io/github/package-json/dependency-version/EcoSenseID/EcoSense-API/cors)](https://www.npmjs.com/package/cors)
@@ -27,7 +28,13 @@ This is the back-end for EcoSense capstone project, which is included in the Ban
 [![firebase-admin](https://img.shields.io/github/package-json/dependency-version/EcoSenseID/EcoSense-API/firebase-admin)](https://www.npmjs.com/package/firebase-admin)
 [![multer](https://img.shields.io/github/package-json/dependency-version/EcoSenseID/EcoSense-API/multer)](https://www.npmjs.com/package/multer)
 [![pg](https://img.shields.io/github/package-json/dependency-version/EcoSenseID/EcoSense-API/pg)](https://www.npmjs.com/package/pg)
+
+### Development
+[![jest](https://img.shields.io/github/package-json/dependency-version/EcoSenseID/EcoSense-API/dev/jest)](https://www.npmjs.com/package/jest)
+[![supertest](https://img.shields.io/github/package-json/dependency-version/EcoSenseID/EcoSense-API/dev/supertest)](https://www.npmjs.com/package/supertest)
+[![nodemon](https://img.shields.io/github/package-json/dependency-version/EcoSenseID/EcoSense-API/dev/nodemon)](https://www.npmjs.com/package/nodemon)
 [![typescript](https://img.shields.io/github/package-json/dependency-version/EcoSenseID/EcoSense-API/dev/typescript)](https://www.npmjs.com/package/typescript)
+
 
 [Go to List of Dependencies](https://github.com/EcoSenseID/EcoSense-API/network/dependencies)
 
@@ -60,11 +67,11 @@ To get the most trending campaigns, you can try to access [this link](https://ec
 
 ## Google Cloud Platform Infrastructure
 - Cloud Source Repositories `ecosense-restapi:main`
-- Cloud Build (Latest: `811b9e74`)
+- Cloud Build (Latest: `30829cbc`)
 - Cloud Build Trigger `ecosense-restapi`
 - Google App Engine 
   - Service `default`
-  - Latest Version `32` `20220609t170333` (June 10, 2022 00:03:33 GMT+7)
+  - Latest Version `33` `20220610t043223` (June 10, 2022 11:32:23 GMT+7)
 - Google Cloud Storage 
   - Bucket for Campaign Posters `ecosense-campaign-posters`
   - Bucket for Task Completion Proof `ecosense-task-proofs`
