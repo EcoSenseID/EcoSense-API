@@ -188,18 +188,16 @@ export const getDashboard = async (request: Request, response: Response) => {
 }
 
 // TODO: DONE!
-export const getAllCategories = (request: Request, response: Response) => {
+export const getAllCategories = async (request: Request, response: Response) => {
     try {
         const queryString = `SELECT * FROM categories ORDER BY id;`;
-        pool.query(queryString, (error: Error, results: any) => {
-            response.status(200).json({
-                error: false,
-                message: "Categories fetched successfully",
-                categories: results.rows.map((data: { id: number; photo_url: string; name: string; color_hex: string; }) => ({
-                    id: data.id, photoUrl: data.photo_url, name: data.name, colorHex: data.color_hex
-                }))
-            });
-            if (error) throw error;
+        const results = await pool.query(queryString);
+        response.status(200).json({
+            error: false,
+            message: "Categories fetched successfully",
+            categories: results.rows.map((data: { id: number; photo_url: string; name: string; color_hex: string; }) => ({
+                id: data.id, photoUrl: data.photo_url, name: data.name, colorHex: data.color_hex
+            }))
         });
     }
     catch(error: any) {
@@ -320,53 +318,51 @@ export const getContributions = async (request: Request, response: Response) => 
             SELECT * FROM campaign_participant WHERE id_user = ${id} ORDER BY id_campaign;
             SELECT * FROM user_experience_points WHERE id_user = ${id} ORDER BY id_category;
         `;
-        pool.query(queryString, (error: Error, results: any) => {
-            const categoriesList = results[0].rows.map((data: { id: number; name: string; }) => ({
-                id: data.id, name: data.name,
-            }))
-            const campaignList = results[1].rows.map((data: any) => ({
-                id: data.id,
-                posterUrl: data.poster_url,
-                title: data.title,
-                endDate: convertToUnixTimestamp(data.end_date),
-                category: (data.category || []).map((data: number) => (
-                    categoriesList.filter((category: { id: number; }) => category.id === data)[0].name
-                )),
-                participantsCount: data.participant_count || 0,
-                isTrending: !data.participant_count ? false : data.participant_count > 100 ? true : false,
-                isNew: Math.round((new Date().getTime() - data.start_date.getTime())/(1000*60*60*24)) <= 7
-            }));
-            const joinedList = results[2].rows;
-            const experiencePoints = results[3].rows.map((data: any) => ({
-                categoryName: categoriesList.filter((category: { id: number; }) => category.id === data.id_category)[0].name,
-                level: Math.floor(data.experience_point/100),
-                currentExperience: data.experience_point % 100, // setiap level itu 100 points
-                levelExperience: 100
-            }))
-            response.status(200).json({
-                error: false,
-                message: "Contributions fetched successfully",
-                experiences: experiencePoints,
-                completedCampaigns: [
-                    ...joinedList.filter((data: { is_completed: boolean; }) => data.is_completed == true).map(
-                        (data: { id_campaign: number; }) => {
-                            const currentCampaignDetail = campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0];
-    
-                            return ({
-                                id: data.id_campaign,
-                                posterUrl: currentCampaignDetail.posterUrl,
-                                title: currentCampaignDetail.title,
-                                endDate: currentCampaignDetail.endDate,
-                                category: currentCampaignDetail.category,
-                                participantsCount: currentCampaignDetail.participantsCount,
-                                isTrending: currentCampaignDetail.isTrending,
-                                isNew: currentCampaignDetail.isNew
-                            });
-                        }
-                    )
-                ]
-            });
-            if (error) throw error;
+        const results = await pool.query(queryString);
+        const categoriesList = results[0].rows.map((data: { id: number; name: string; }) => ({
+            id: data.id, name: data.name,
+        }))
+        const campaignList = results[1].rows.map((data: any) => ({
+            id: data.id,
+            posterUrl: data.poster_url,
+            title: data.title,
+            endDate: convertToUnixTimestamp(data.end_date),
+            category: (data.category || []).map((data: number) => (
+                categoriesList.filter((category: { id: number; }) => category.id === data)[0].name
+            )),
+            participantsCount: data.participant_count || 0,
+            isTrending: !data.participant_count ? false : data.participant_count > 100 ? true : false,
+            isNew: Math.round((new Date().getTime() - data.start_date.getTime())/(1000*60*60*24)) <= 7
+        }));
+        const joinedList = results[2].rows;
+        const experiencePoints = results[3].rows.map((data: any) => ({
+            categoryName: categoriesList.filter((category: { id: number; }) => category.id === data.id_category)[0].name,
+            level: Math.floor(data.experience_point/100),
+            currentExperience: data.experience_point % 100, // setiap level itu 100 points
+            levelExperience: 100
+        }))
+        response.status(200).json({
+            error: false,
+            message: "Contributions fetched successfully",
+            experiences: experiencePoints,
+            completedCampaigns: [
+                ...joinedList.filter((data: { is_completed: boolean; }) => data.is_completed == true).map(
+                    (data: { id_campaign: number; }) => {
+                        const currentCampaignDetail = campaignList.filter((campaign: { id: number; }) => campaign.id == data.id_campaign)[0];
+
+                        return ({
+                            id: data.id_campaign,
+                            posterUrl: currentCampaignDetail.posterUrl,
+                            title: currentCampaignDetail.title,
+                            endDate: currentCampaignDetail.endDate,
+                            category: currentCampaignDetail.category,
+                            participantsCount: currentCampaignDetail.participantsCount,
+                            isTrending: currentCampaignDetail.isTrending,
+                            isNew: currentCampaignDetail.isNew
+                        });
+                    }
+                )
+            ]
         });
     }
     catch(error: any) {
@@ -394,9 +390,8 @@ export const postProof = async (request: Request, response: Response) => {
         // Check if the task requires proof or not
         const queryString1 = `SELECT require_proof FROM tasks WHERE id = ${taskId};`;
         let require_proof = true;
-        pool.query(queryString1, (error: Error, results: any) => {
-            require_proof = results.rows[0].require_proof;
-        });
+        const results1 = await pool.query(queryString1);
+        require_proof = results1.rows[0].require_proof;
         
         let photoGCSURL = '';
         if (require_proof && !photo) {
@@ -417,26 +412,25 @@ export const postProof = async (request: Request, response: Response) => {
         }
 
         const currentDate = new Date().toISOString();
+        
         // Insert to Database
         const queryString2 = `
             INSERT INTO completed_tasks (id_task, id_user, photo_url, timestamp, caption) VALUES (${taskId}, ${id}, '${photoGCSURL}', '${currentDate}', '${caption}') RETURNING photo_url;
             SELECT * FROM completed_tasks WHERE photo_url = '${photoGCSURL}';
         `;
-        // console.log(queryString2);
-        pool.query(queryString2, (error: Error, results: any) => {
-            // console.log(results);
-            if (results[1].rows.length !== 0) {
-                response.status(200).json({
-                    error: false,
-                    message: "Success"
-                });
-            } else {
-                response.status(400).json({
-                    error: true,
-                    message: "Input to DB not successful"
-                });
-            }
-        });
+        const results = await pool.query(queryString2);
+        
+        if (results[1].rows.length !== 0) {
+            response.status(200).json({
+                error: false,
+                message: "Success"
+            });
+        } else {
+            response.status(400).json({
+                error: true,
+                message: "Input to DB not successful"
+            });
+        }
     }
     catch (err: any) {
         response.status(400).json({
@@ -515,13 +509,12 @@ export const joinCampaign = async (request: Request, response: Response) => {
             VALUES (${campaignId}, ${id}, false, '${currentDate}', '${currentDate}');
             SELECT * FROM campaign_participant WHERE id_campaign = ${campaignId} AND id_user = ${id};
         `;
-        pool.query(queryString, (error: Error, results: any) => {
-            if (results[1].rows.length !== 0) {
-                response.status(200).json({ error: false, message: "Success" });
-            } else {
-                response.status(400).json({ error: true, message: "Insert to DB not successful" });
-            }
-        })
+        const results = await pool.query(queryString);
+        if (results[1].rows.length !== 0) {
+            response.status(200).json({ error: false, message: "Success" });
+        } else {
+            response.status(400).json({ error: true, message: "Insert to DB not successful" });
+        }
     }
     catch (err: any) {
         response.status(400).json({

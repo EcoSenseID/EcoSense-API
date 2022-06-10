@@ -20,7 +20,7 @@ import getIdFromIdToken from '../helpers/get-id.js';
 //     });
 // }
 
-export const getTrendingCampaigns = (request: Request, response: Response) => {
+export const getTrendingCampaigns = async (request: Request, response: Response) => {
     try {
       const queryString = `
           SELECT * FROM campaigns
@@ -30,19 +30,18 @@ export const getTrendingCampaigns = (request: Request, response: Response) => {
           ON campaigns.id = b.id_campaign
           ORDER BY id;
       `;
-      pool.query(queryString, (error: Error, results: any) => {
-        // if (error) throw error;
-        response.status(200).json({
-            error: false,
-            message: "Trending campaigns fetched successfully",
-            campaigns: results.rows.map((data: { id: number; poster_url: string; title: string; description: string; }) => ({
-              id: data.id,
-              posterUrl: data.poster_url,
-              title: data.title,
-              description: data.description
-          }))
-        });
-      })
+      const results = await pool.query(queryString);
+      
+      response.status(200).json({
+          error: false,
+          message: "Trending campaigns fetched successfully",
+          campaigns: results.rows.map((data: { id: number; poster_url: string; title: string; description: string; }) => ({
+            id: data.id,
+            posterUrl: data.poster_url,
+            title: data.title,
+            description: data.description
+        }))
+      });
     }
     catch (error: any) {
       response.status(400).json({
