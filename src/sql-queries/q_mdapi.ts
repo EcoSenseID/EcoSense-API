@@ -303,6 +303,7 @@ export const getCampaignDetail = async (request: Request, response: Response) =>
 // TODO: DONE!
 export const getContributions = async (request: Request, response: Response) => {
     const { authorization } = request.headers;
+    const levelExp = [100, 120, 140, 170, 210, 250, 300, 360, 430, 520, 620, 740, 890, 1070, 1280, 1540, 1850, 2220, 2660, 3190];
 
     try {
         const { id } = await getIdFromIdToken(authorization!);
@@ -335,12 +336,26 @@ export const getContributions = async (request: Request, response: Response) => 
             isNew: Math.round((new Date().getTime() - data.start_date.getTime())/(1000*60*60*24)) <= 7
         }));
         const joinedList = results[2].rows;
-        const experiencePoints = results[3].rows.map((data: any) => ({
-            categoryName: categoriesList.filter((category: { id: number; }) => category.id === data.id_category)[0].name,
-            level: Math.floor(data.experience_point/100),
-            currentExperience: data.experience_point % 100, // setiap level itu 100 points
-            levelExperience: 100
-        }))
+        const experiencePoints = results[3].rows.map((data: any) => {
+            let currentPoint = parseInt(data.experience_point);
+            let cLevel = 0;
+            let idx = 0;
+            for (let i = 0; i < levelExp.length; i++) {
+                if (currentPoint < levelExp[i]) {
+                    break;
+                } else {
+                    cLevel += 1;
+                    currentPoint -= levelExp[i];
+                    idx += 1;
+                }
+            }
+            return ({
+                categoryName: categoriesList.filter((category: { id: number; }) => category.id === data.id_category)[0].name,
+                level: cLevel,
+                currentExperience: currentPoint,
+                levelExperience: idx === levelExp.length ? 9999 : levelExp[idx]
+            })
+        })
         response.status(200).json({
             error: false,
             message: "Contributions fetched successfully",
@@ -412,7 +427,7 @@ export const postProof = async (request: Request, response: Response) => {
         }
 
         const currentDate = new Date().toISOString();
-        
+
         // Insert to Database
         const queryString2 = `
             INSERT INTO completed_tasks (id_task, id_user, photo_url, timestamp, caption) VALUES (${taskId}, ${id}, '${photoGCSURL}', '${currentDate}', '${caption}') RETURNING photo_url;
