@@ -485,11 +485,15 @@ export const postCompleteCampaign = async (request: Request, response: Response)
 
             let queryString1 = '';
             expGiven.map((data: any) => {
-                queryString1 += `
-                    UPDATE user_experience_points 
-                    SET experience_point = ${currentExp.filter((cData: { categoryId: number; }) => cData.categoryId === data.categoryId)[0].exp + data.exp} 
-                    WHERE id_category = ${data.categoryId} AND id_user = ${id};
-                `;
+                if (currentExp.filter((cData: { categoryId: number; }) => cData.categoryId === data.categoryId).length !== 0) {
+                    queryString1 += `
+                        UPDATE user_experience_points 
+                        SET experience_point = ${currentExp.filter((cData: { categoryId: number; }) => cData.categoryId === data.categoryId)[0].exp + data.exp} 
+                        WHERE id_category = ${data.categoryId} AND id_user = ${id};
+                    `;
+                } else {
+                    queryString1 += `INSERT INTO user_experience_points (id_category, id_user, experience_point) VALUES (${data.categoryId}, ${id}, ${data.exp});`;
+                }
             });
             // console.log(queryString1);
             const results1 = await pool.query(queryString1);
