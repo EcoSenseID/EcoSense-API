@@ -478,20 +478,24 @@ export const postCompleteCampaign = async (request: Request, response: Response)
                 categoryId: parseInt(data.id_category),
                 exp: parseInt(data.earned_experience_point)
             }));
+            // console.log('expGiven', expGiven);
             const currentExp = results[3].rows.map((data: any) => ({
                 categoryId: parseInt(data.id_category),
                 exp: parseInt(data.experience_point)
             }));
+            // console.log('currentExp', currentExp);
 
             let queryString1 = '';
             expGiven.map((data: any) => {
                 if (currentExp.filter((cData: { categoryId: number; }) => cData.categoryId === data.categoryId).length !== 0) {
+                    // console.log('cData', currentExp.filter((cData: { categoryId: number; }) => cData.categoryId === data.categoryId));
                     queryString1 += `
                         UPDATE user_experience_points 
                         SET experience_point = ${currentExp.filter((cData: { categoryId: number; }) => cData.categoryId === data.categoryId)[0].exp + data.exp} 
                         WHERE id_category = ${data.categoryId} AND id_user = ${id};
                     `;
                 } else {
+                    console.log('data.exp', data.exp);
                     queryString1 += `INSERT INTO user_experience_points (id_category, id_user, experience_point) VALUES (${data.categoryId}, ${id}, ${data.exp});`;
                 }
             });
@@ -509,7 +513,7 @@ export const postCompleteCampaign = async (request: Request, response: Response)
     }
     catch (err: any) {
         response.status(400).json({
-            error: true, message: err.message
+            error: true, message: err.message, errorDetail: err
         });
     }
 }

@@ -8,7 +8,7 @@
     "build": "npx tsc",
     "gcp-build": "npx tsc",
     "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/server.js\"",
-    "start": "node dist/server.js",
+    "start": "node dist/src/server.js",
     "create-env": "printenv > .env"
   },
   "author": "Kenrick Tandrian",
