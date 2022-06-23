@@ -15,7 +15,7 @@
   "license": "ISC",
   "dependencies": {
     "@google-cloud/secret-manager": "^4.0.0",
-    "@google-cloud/storage": "^6.1.0",
+    "@google-cloud/storage": "^6.2.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
@@ -35,7 +35,7 @@
     "nodemon": "^2.0.16",
     "supertest": "^6.2.3",
     "ts-jest": "^28.0.4",
-    "typescript": "^4.7.3"
+    "typescript": "^4.7.4"
   },
   "type": "module"
 }
