@@ -462,52 +462,62 @@ export const postCompleteCampaign = async (request: Request, response: Response)
     try {
         const { id } = await getIdFromIdToken(authorization!);
 
-        const currentDate = new Date().toISOString(); 
-        const queryString = `
-            UPDATE campaign_participant 
-            SET is_completed = true, completed_timestamp = '${currentDate}'
-            WHERE id_campaign = ${campaignId} AND id_user = ${id};
-            SELECT is_completed FROM campaign_participant WHERE id_campaign = ${campaignId} AND id_user = ${id};
-            SELECT id_category, id_campaign, earned_experience_point FROM category_campaign WHERE id_campaign = ${campaignId};
-            SELECT id_category, id_user, experience_point FROM user_experience_points WHERE id_user = ${id};
-        `;
-        const results = await pool.query(queryString);
-        const isCompleted = results[1].rows[0].is_completed;
-        if (isCompleted) {
-            const expGiven = results[2].rows.map((data: any) => ({
-                categoryId: parseInt(data.id_category),
-                exp: parseInt(data.earned_experience_point)
-            }));
-            // console.log('expGiven', expGiven);
-            const currentExp = results[3].rows.map((data: any) => ({
-                categoryId: parseInt(data.id_category),
-                exp: parseInt(data.experience_point)
-            }));
-            // console.log('currentExp', currentExp);
+        const firstQuery = `SELECT is_completed FROM campaign_participant WHERE id_campaign = ${campaignId} AND id_user = ${id};`
+        const firstResult = await pool.query(firstQuery);
+        const doneAlready = firstResult.rows[0].is_completed;
 
-            let queryString1 = '';
-            expGiven.map((data: any) => {
-                if (currentExp.filter((cData: { categoryId: number; }) => cData.categoryId === data.categoryId).length !== 0) {
-                    // console.log('cData', currentExp.filter((cData: { categoryId: number; }) => cData.categoryId === data.categoryId));
-                    queryString1 += `
-                        UPDATE user_experience_points 
-                        SET experience_point = ${currentExp.filter((cData: { categoryId: number; }) => cData.categoryId === data.categoryId)[0].exp + data.exp} 
-                        WHERE id_category = ${data.categoryId} AND id_user = ${id};
-                    `;
-                } else {
-                    console.log('data.exp', data.exp);
-                    queryString1 += `INSERT INTO user_experience_points (id_category, id_user, experience_point) VALUES (${data.categoryId}, ${id}, ${data.exp});`;
-                }
-            });
-            // console.log(queryString1);
-            const results1 = await pool.query(queryString1);
-            response.status(200).json({
-                error: false, message: "Success"
-            });
+        if(doneAlready === false) {
+            const currentDate = new Date().toISOString(); 
+            const queryString = `
+                UPDATE campaign_participant 
+                SET is_completed = true, completed_timestamp = '${currentDate}'
+                WHERE id_campaign = ${campaignId} AND id_user = ${id};
+                SELECT is_completed FROM campaign_participant WHERE id_campaign = ${campaignId} AND id_user = ${id};
+                SELECT id_category, id_campaign, earned_experience_point FROM category_campaign WHERE id_campaign = ${campaignId};
+                SELECT id_category, id_user, experience_point FROM user_experience_points WHERE id_user = ${id};
+            `;
+            const results = await pool.query(queryString);
+            const isCompleted = results[1].rows[0].is_completed;
+            if (isCompleted) {
+                const expGiven = results[2].rows.map((data: any) => ({
+                    categoryId: parseInt(data.id_category),
+                    exp: parseInt(data.earned_experience_point)
+                }));
+                // console.log('expGiven', expGiven);
+                const currentExp = results[3].rows.map((data: any) => ({
+                    categoryId: parseInt(data.id_category),
+                    exp: parseInt(data.experience_point)
+                }));
+                // console.log('currentExp', currentExp);
+    
+                let queryString1 = '';
+                expGiven.map((data: any) => {
+                    if (currentExp.filter((cData: { categoryId: number; }) => cData.categoryId === data.categoryId).length !== 0) {
+                        // console.log('cData', currentExp.filter((cData: { categoryId: number; }) => cData.categoryId === data.categoryId));
+                        queryString1 += `
+                            UPDATE user_experience_points 
+                            SET experience_point = ${currentExp.filter((cData: { categoryId: number; }) => cData.categoryId === data.categoryId)[0].exp + data.exp} 
+                            WHERE id_category = ${data.categoryId} AND id_user = ${id};
+                        `;
+                    } else {
+                        console.log('data.exp', data.exp);
+                        queryString1 += `INSERT INTO user_experience_points (id_category, id_user, experience_point) VALUES (${data.categoryId}, ${id}, ${data.exp});`;
+                    }
+                });
+                // console.log(queryString1);
+                const results1 = await pool.query(queryString1);
+                response.status(200).json({
+                    error: false, message: "Success"
+                });
+            } else {
+                response.status(400).json({
+                    error: true,
+                    message: "Update DB not successful"
+                });
+            }
         } else {
-            response.status(400).json({
-                error: true,
-                message: "Update DB not successful"
+            response.status(200).json({
+                error: false, message: "Campaign has already done"
             });
         }
     }
