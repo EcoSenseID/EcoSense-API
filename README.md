@@ -32,7 +32,7 @@ This is the back-end for EcoSense capstone project, which is included in the Ban
 ### Development
 [![jest](https://img.shields.io/github/package-json/dependency-version/EcoSenseID/EcoSense-API/dev/jest)](https://www.npmjs.com/package/jest)
 [![supertest](https://img.shields.io/github/package-json/dependency-version/EcoSenseID/EcoSense-API/dev/supertest)](https://www.npmjs.com/package/supertest)
-[![nodemon](https://img.shields.io/github/package-json/dependency-version/EcoSenseID/EcoSense-API/dev/nodemon)](https://www.npmjs.com/package/nodemon)
+[![concurrently](https://img.shields.io/github/package-json/dependency-version/EcoSenseID/EcoSense-API/dev/concurrently)](https://www.npmjs.com/package/concurrently)
 [![typescript](https://img.shields.io/github/package-json/dependency-version/EcoSenseID/EcoSense-API/dev/typescript)](https://www.npmjs.com/package/typescript)
 
 
